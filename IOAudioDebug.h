@@ -23,46 +23,16 @@
 #ifndef _IOAUDIODEBUG_H
 #define _IOAUDIODEBUG_H
 
-#ifdef DEBUG
-	#define DEBUG_LEVEL 3						//<rdar://problem/9725460>
-	//#define DEBUG_USE_FIRELOG 1
-	#define DEBUG_USE_FIREWIRE_KPRINTF 1
-	
-	#ifdef DEBUG_USE_FIRELOG
-	#include <IOKit/firewire/FireLog.h>
-	#define audioDebugIOLog( level, message... ) \
-		do {FireLog(  message ); FireLog("\n");} while (0)
-	#endif
-	
-	#ifdef DEBUG_USE_IOUSBLOG
-	#include <IOKit/usb/IOUSBLog.h>
-	#define audioDebugIOLog( level, message... ) \
-		do {USBLog( level, message );} while (0)
-	#endif
-
-	#ifdef DEBUG_USE_FIREWIRE_KPRINTF
-	#define audioDebugIOLog( level, message... ) \
-		do { if (level <= DEBUG_LEVEL) kprintf( message );} while (0)
-	#endif
-
-
-
-	#ifdef assert
-		#undef assert
-
-		#define AssertionMessage( cond, file, line ) \
-			"assert \"" #cond "\" failed in " #file " at line " #line
-
-		#define AssertionFailed( cond, file, line ) \
-			panic(AssertionMessage( cond, file, line ));
-
-		#define	assert( cond )								\
-			if( !(cond) ) {									\
-				AssertionFailed( cond, __FILE__, __LINE__ )	\
-			}
-	#endif
+#ifdef DEBUG_MSG
+    #define DbgLog(args...)  IOLog(args)
 #else
-	#define audioDebugIOLog( level, message... ) ;
+    #define DbgLog(args...)
+#endif
+
+#ifdef DEBUG_DEVC
+    #define deviceDbgLog(args...)  IOLog(args)
+#else
+    #define deviceDbgLog(args...)
 #endif
 
 #endif /* _IOAUDIODEBUG_H */

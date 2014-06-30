@@ -137,7 +137,7 @@ Exit:
 AbsoluteTime IOAudioTimeIntervalFilter::newTimePosition(AbsoluteTime rawSnapshotAT)
 {
 	int			n;
-	uint64_t	rawSnapshot = __OSAbsoluteTime(rawSnapshotAT);
+	uint64_t	rawSnapshot = *(uint64_t *)&rawSnapshotAT;
 	uint64_t	filteredSnapshot = 0;
 	int			prevPointer;
 	

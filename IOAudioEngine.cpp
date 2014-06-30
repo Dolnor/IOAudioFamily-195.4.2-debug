@@ -136,18 +136,18 @@ IOReturn IOAudioEngine::createUserClient(task_t task, void *securityID, UInt32 t
 
 // OSMetaClassDefineReservedUsed(IOAudioEngine, 11);
 void IOAudioEngine::setInputSampleOffset(UInt32 numSamples) {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::setInputSampleOffset(0x%lx)\n", this, (long unsigned int)numSamples);
+    DbgLog("+ IOAudioEngine[%p]::setInputSampleOffset(0x%lx)\n", this, (long unsigned int)numSamples);
 	assert(reserved);
 	reserved->inputSampleOffset = numSamples;
     setProperty(kIOAudioEngineInputSampleOffsetKey, numSamples, sizeof(UInt32)*8);
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::setInputSampleOffset(0x%lx)\n", this, (long unsigned int)numSamples);
+    DbgLog("- IOAudioEngine[%p]::setInputSampleOffset(0x%lx)\n", this, (long unsigned int)numSamples);
 }
 
 // OSMetaClassDefineReservedUsed(IOAudioEngine, 10);
 void IOAudioEngine::setOutputSampleOffset(UInt32 numSamples) {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::setOutputSampleOffset(0x%lx)\n", this, (long unsigned int)numSamples);
+    DbgLog("+ IOAudioEngine[%p]::setOutputSampleOffset(0x%lx)\n", this, (long unsigned int)numSamples);
 	setSampleOffset(numSamples);
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::setOutputSampleOffset(0x%lx)\n", this, (long unsigned int)numSamples);
+    DbgLog("- IOAudioEngine[%p]::setOutputSampleOffset(0x%lx)\n", this, (long unsigned int)numSamples);
 }
 
 // OSMetaClassDefineReservedUsed(IOAudioEngine, 9);
@@ -223,7 +223,7 @@ void IOAudioEngine::unlockStreamForIO(IOAudioStream *stream) {
 // OSMetaClassDefineReservedUsed(IOAudioEngine, 2);
 IOReturn IOAudioEngine::performFormatChange(IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioStreamFormatExtension *formatExtension, const IOAudioSampleRate *newSampleRate)
 {
-    audioDebugIOLog(3, "+-IOAudioEngine[%p]::performFormatChange(%p, %p, %p, %p)\n", this, audioStream, newFormat, formatExtension, newSampleRate);
+    DbgLog("+-IOAudioEngine[%p]::performFormatChange(%p, %p, %p, %p)\n", this, audioStream, newFormat, formatExtension, newSampleRate);
 
     return kIOReturnUnsupported;
 }
@@ -231,7 +231,7 @@ IOReturn IOAudioEngine::performFormatChange(IOAudioStream *audioStream, const IO
 // OSMetaClassDefineReservedUsed(IOAudioEngine, 1);
 IOBufferMemoryDescriptor *IOAudioEngine::getStatusDescriptor()
 {
-    audioDebugIOLog(3, "+-IOAudioEngine[%p]::getStatusDescriptor()\n", this);
+    DbgLog("+-IOAudioEngine[%p]::getStatusDescriptor()\n", this);
 	assert(reserved);
 
 	return reserved->statusDescriptor;
@@ -373,7 +373,7 @@ bool IOAudioEngine::init(OSDictionary *properties)
 {
 	bool			result = false;
 	
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::init(%p)\n", this, properties);
+    DbgLog("+ IOAudioEngine[%p]::init(%p)\n", this, properties);
 
 	OSDictionary * pDict = NULL;	
 	
@@ -381,11 +381,11 @@ bool IOAudioEngine::init(OSDictionary *properties)
 	{
 		pDict = (OSDictionary*)properties->copyCollection();
 			
-		audioDebugIOLog(3, "  Make copy of properties(%p) != pDict(%p)\n", properties, pDict);
+		DbgLog("  Make copy of properties(%p) != pDict(%p)\n", properties, pDict);
 	}
 	else
 	{
-		audioDebugIOLog(3, "  properties(%p) == NULL\n", properties);
+		DbgLog("  properties(%p) == NULL\n", properties);
 	}
 	
 	if ( super::init ( pDict ) )
@@ -454,14 +454,14 @@ bool IOAudioEngine::init(OSDictionary *properties)
 		}
 	}
 
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::init(%p)\n", this, properties);
+    DbgLog("- IOAudioEngine[%p]::init(%p)\n", this, properties);
     return result;
 }
 
 // <rdar://12188841>
 void IOAudioEngine::free()
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::free()\n", this);
+    DbgLog("+ IOAudioEngine[%p]::free()\n", this);
 
 	if (reserved) {
 		if (reserved->statusDescriptor) {
@@ -525,13 +525,13 @@ void IOAudioEngine::free()
 
     super::free();
 	
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::free()\n", this);
+    DbgLog("- IOAudioEngine[%p]::free()\n", this);
 	return;
 }
 
 bool IOAudioEngine::initHardware(IOService *provider)
 {
-    audioDebugIOLog(3, "+-IOAudioEngine[%p]::initHardware(%p)\n", this, provider);
+    DbgLog("+-IOAudioEngine[%p]::initHardware(%p)\n", this, provider);
 
     return true;
 }
@@ -544,11 +544,11 @@ bool IOAudioEngine::start(IOService *provider)
 {
 	bool			result = false;
 	
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::start(%p)\n", this, provider);
+    DbgLog("+ IOAudioEngine[%p]::start(%p)\n", this, provider);
 
     result = start(provider, OSDynamicCast(IOAudioDevice, provider));
 	
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::start(%p) returns %d\n", this, provider, result);
+    DbgLog("- IOAudioEngine[%p]::start(%p) returns %d\n", this, provider, result);
 	return result;
 }
 
@@ -560,7 +560,7 @@ bool IOAudioEngine::start(IOService *provider, IOAudioDevice *device)
 {
     bool result = false;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::start(%p, %p)\n", this, provider, device);
+    DbgLog("+ IOAudioEngine[%p]::start(%p, %p)\n", this, provider, device);
 	
 	if ( super::start ( provider ) )
 	{
@@ -589,28 +589,28 @@ bool IOAudioEngine::start(IOService *provider, IOAudioDevice *device)
 		}
 	}
         
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::start(%p, %p)\n", this, provider, device);
+    DbgLog("- IOAudioEngine[%p]::start(%p, %p)\n", this, provider, device);
     return result;
 }
 
 void IOAudioEngine::stop(IOService *provider)
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::stop(%p)\n", this, provider);
+    DbgLog("+ IOAudioEngine[%p]::stop(%p)\n", this, provider);
 
     if (commandGate)
 	{
         commandGate->runAction ( detachUserClientsAction );
     }
     
-    audioDebugIOLog(3, "  about to stopAudioEngine ()\n" );
+    DbgLog("  about to stopAudioEngine ()\n" );
     stopAudioEngine ();
-    audioDebugIOLog(3, "  about to detachAudioStreams ()\n" );
+    DbgLog("  about to detachAudioStreams ()\n" );
 
 	removeTimer();													//	<rdar://14198236>
     detachAudioStreams ();
-    audioDebugIOLog(3, "  about to removeAllDefaultAudioControls ()\n" );
+    DbgLog("  about to removeAllDefaultAudioControls ()\n" );
     removeAllDefaultAudioControls ();
-    audioDebugIOLog(3, "  completed removeAllDefaultAudioControls ()\n" );
+    DbgLog("  completed removeAllDefaultAudioControls ()\n" );
 
 	// <rdar://7233118>, <rdar://7029696> Remove the event source here as performing heavy workloop operation in free() could lead
 	// to deadlock since the context which free() is called is not known. stop() is called on the workloop, so it is safe to remove 
@@ -623,40 +623,40 @@ void IOAudioEngine::stop(IOService *provider)
 			if (workLoop)
 			{
 				workLoop->removeEventSource ( commandGate );
-				audioDebugIOLog(3, "  completed removeEventSource ( ... )\n" );
+				DbgLog("  completed removeEventSource ( ... )\n" );
 			}
 			
 			commandGate->release();
 			commandGate = NULL;
-			audioDebugIOLog(3, "  completed release ()\n" );
+			DbgLog("  completed release ()\n" );
 		}
 	}
 	else {	// <rdar://8518215>
 		reserved->commandGateStatus = kCommandGateStatus_RemovalPending;
 	}
 
-    audioDebugIOLog(3, "  about to super::stop ( ... )\n" );
+    DbgLog("  about to super::stop ( ... )\n" );
     super::stop ( provider );
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::stop(%p)\n", this, provider);
+    DbgLog("- IOAudioEngine[%p]::stop(%p)\n", this, provider);
 }
 
 IOWorkLoop *IOAudioEngine::getWorkLoop() const
 {
-    audioDebugIOLog(3, "+-IOAudioEngine[%p]::getWorkLoop()\n", this);
+    DbgLog("+-IOAudioEngine[%p]::getWorkLoop()\n", this);
 
     return workLoop;
 }
 
 IOCommandGate *IOAudioEngine::getCommandGate() const
 {
-    audioDebugIOLog(3, "+-IOAudioEngine[%p]::getCommandGate()\n", this);
+    DbgLog("+-IOAudioEngine[%p]::getCommandGate()\n", this);
 
     return commandGate;
 }
 
 void IOAudioEngine::registerService(IOOptionBits options)
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::registerService(0x%lx)\n", this, (long unsigned int)options);
+    DbgLog("+ IOAudioEngine[%p]::registerService(0x%lx)\n", this, (long unsigned int)options);
 
     if (!isRegistered) {
         OSCollectionIterator *iterator;
@@ -689,7 +689,7 @@ void IOAudioEngine::registerService(IOOptionBits options)
         isRegistered = true;
     }
     
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::registerService(0x%lx)\n", this, (long unsigned int)options);
+    DbgLog("- IOAudioEngine[%p]::registerService(0x%lx)\n", this, (long unsigned int)options);
 	return;
 }
 
@@ -793,7 +793,7 @@ void IOAudioEngine::setDescription(const char *description)
 
 void IOAudioEngine::resetStatusBuffer()
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::resetStatusBuffer()\n", this);
+    DbgLog("+ IOAudioEngine[%p]::resetStatusBuffer()\n", this);
 
     assert(status);
     
@@ -810,7 +810,7 @@ void IOAudioEngine::resetStatusBuffer()
     
     stopEngineAtPosition(NULL);
     
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::resetStatusBuffer()\n", this);
+    DbgLog("- IOAudioEngine[%p]::resetStatusBuffer()\n", this);
     return;
 }
 
@@ -864,7 +864,7 @@ IOReturn IOAudioEngine::newUserClient(task_t task, void *securityID, UInt32 type
     IOReturn				result = kIOReturnSuccess;
     IOAudioEngineUserClient	*client;
 
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::newUserClient(0x%x, %p, 0x%lx, %p)\n", this, (unsigned int)task, securityID, type, handler);
+    DbgLog("+ IOAudioEngine[%p]::newUserClient(0x%x, %p, 0x%lx, %p)\n", this, (unsigned int)task, securityID, type, handler);
 
     if (!isInactive()) {
         result = createUserClient(task, securityID, type, &client);
@@ -893,7 +893,7 @@ IOReturn IOAudioEngine::newUserClient(task_t task, void *securityID, UInt32 type
         result = kIOReturnNoDevice;
     }
 	
-	audioDebugIOLog(3, "- IOAudioEngine[%p]::newUserClient(0x%x, %p, 0x%lx, %p)\n", this, (unsigned int)task, securityID, type, handler);
+	DbgLog("- IOAudioEngine[%p]::newUserClient(0x%x, %p, 0x%lx, %p)\n", this, (unsigned int)task, securityID, type, handler);
    return result;
 #endif
 }
@@ -907,7 +907,7 @@ IOReturn IOAudioEngine::newUserClient(task_t task, void *securityID, UInt32 type
 		return kIOReturnSuccess;
 	}
 	
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::newUserClient(0x%p, %p, 0x%lx, %p, %p)\n", this, task, securityID, (long unsigned int)type, properties, handler);
+    DbgLog("+ IOAudioEngine[%p]::newUserClient(0x%p, %p, 0x%lx, %p, %p)\n", this, task, securityID, (long unsigned int)type, properties, handler);
 	
     if (!isInactive()) {
         result = createUserClient(task, securityID, type, &client, properties);
@@ -936,20 +936,20 @@ IOReturn IOAudioEngine::newUserClient(task_t task, void *securityID, UInt32 type
         result = kIOReturnNoDevice;
     }
 
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::newUserClient(0x%p, %p, 0x%lx, %p, %p)\n", this, task, securityID, (long unsigned int)type, properties, handler);
+    DbgLog("- IOAudioEngine[%p]::newUserClient(0x%p, %p, 0x%lx, %p, %p)\n", this, task, securityID, (long unsigned int)type, properties, handler);
     return result;
 }
 
 void IOAudioEngine::clientClosed(IOAudioEngineUserClient *client)
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::clientClosed(%p)\n", this, client);
+    DbgLog("+ IOAudioEngine[%p]::clientClosed(%p)\n", this, client);
 
     if (client) {
         assert(workLoop);												// <rdar://7529580>
 
         workLoop->runAction(_removeUserClientAction, this, client);		//	<rdar://7529580>
     }
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::clientClosed(%p)\n", this, client);
+    DbgLog("- IOAudioEngine[%p]::clientClosed(%p)\n", this, client);
 }
 
 // <rdar://7529580>
@@ -981,7 +981,7 @@ IOReturn IOAudioEngine::addUserClientAction(OSObject *owner, void *arg1, void *a
 {
     IOReturn result = kIOReturnBadArgument;
     
-    audioDebugIOLog(3, "+ IOAudioEngine::addUserClientAction(%p, %p)\n", owner, arg1);
+    DbgLog("+ IOAudioEngine::addUserClientAction(%p, %p)\n", owner, arg1);
 
     if (owner) {
         IOAudioEngine *audioEngine = OSDynamicCast(IOAudioEngine, owner);
@@ -990,7 +990,7 @@ IOReturn IOAudioEngine::addUserClientAction(OSObject *owner, void *arg1, void *a
         }
     }
     
-    audioDebugIOLog(3, "- IOAudioEngine::addUserClientAction(%p, %p) returns 0x%lX\n", owner, arg1, (long unsigned int)result );
+    DbgLog("- IOAudioEngine::addUserClientAction(%p, %p) returns 0x%lX\n", owner, arg1, (long unsigned int)result );
     return result;
 }
 
@@ -1023,7 +1023,7 @@ IOReturn IOAudioEngine::removeUserClientAction(OSObject *owner, void *arg1, void
 {
     IOReturn result = kIOReturnBadArgument;
     
-    audioDebugIOLog(3, "+ IOAudioEngine::removeUserClientAction(%p, %p)\n", owner, arg1);
+    DbgLog("+ IOAudioEngine::removeUserClientAction(%p, %p)\n", owner, arg1);
 
     if (owner) {
         IOAudioEngine *audioEngine = OSDynamicCast(IOAudioEngine, owner);
@@ -1032,7 +1032,7 @@ IOReturn IOAudioEngine::removeUserClientAction(OSObject *owner, void *arg1, void
         }
     }
     
-    audioDebugIOLog(3, "- IOAudioEngine::removeUserClientAction(%p, %p) returns 0x%lX\n", owner, arg1, (long unsigned int)result );
+    DbgLog("- IOAudioEngine::removeUserClientAction(%p, %p) returns 0x%lX\n", owner, arg1, (long unsigned int)result );
     return result;
 }
 
@@ -1040,7 +1040,7 @@ IOReturn IOAudioEngine::detachUserClientsAction(OSObject *owner, void *arg1, voi
 {
     IOReturn result = kIOReturnBadArgument;
     
-    audioDebugIOLog(3, "+ IOAudioEngine::detachUserClientsAction(%p, %p, %p, %p, %p)\n", owner, arg1, arg2, arg3, arg4);
+    DbgLog("+ IOAudioEngine::detachUserClientsAction(%p, %p, %p, %p, %p)\n", owner, arg1, arg2, arg3, arg4);
 
     if (owner) {
         IOAudioEngine *audioEngine = OSDynamicCast(IOAudioEngine, owner);
@@ -1049,7 +1049,7 @@ IOReturn IOAudioEngine::detachUserClientsAction(OSObject *owner, void *arg1, voi
         }
     }
     
-    audioDebugIOLog(3, "- IOAudioEngine::detachUserClientsAction(%p, %p, %p, %p, %p) returns 0x%lX\n", owner, arg1, arg2, arg3, arg4, (long unsigned int)result );
+    DbgLog("- IOAudioEngine::detachUserClientsAction(%p, %p, %p, %p, %p) returns 0x%lX\n", owner, arg1, arg2, arg3, arg4, (long unsigned int)result );
     return result;
 }
 
@@ -1057,13 +1057,13 @@ IOReturn IOAudioEngine::addUserClient(IOAudioEngineUserClient *newUserClient)
 {
     IOReturn result = kIOReturnSuccess;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::addUserClient(%p)\n", this, newUserClient);
+    DbgLog("+ IOAudioEngine[%p]::addUserClient(%p)\n", this, newUserClient);
 
     assert(userClients);
     
     userClients->setObject(newUserClient);
     
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::addUserClient(%p) returns 0x%lX\n", this, newUserClient, (long unsigned int)result );
+    DbgLog("- IOAudioEngine[%p]::addUserClient(%p) returns 0x%lX\n", this, newUserClient, (long unsigned int)result );
     return result;
 }
 
@@ -1071,7 +1071,7 @@ IOReturn IOAudioEngine::removeUserClient(IOAudioEngineUserClient *userClient)
 {
     IOReturn result = kIOReturnSuccess;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::removeUserClient(%p)\n", this, userClient);
+    DbgLog("+ IOAudioEngine[%p]::removeUserClient(%p)\n", this, userClient);
 
     assert(userClients);
     
@@ -1089,7 +1089,7 @@ IOReturn IOAudioEngine::removeUserClient(IOAudioEngineUserClient *userClient)
     
     userClient->release();
     
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::removeUserClient(%p) returns 0x%lX\n", this, userClient, (long unsigned int)result );
+    DbgLog("- IOAudioEngine[%p]::removeUserClient(%p) returns 0x%lX\n", this, userClient, (long unsigned int)result );
     return result;
 }
 
@@ -1097,12 +1097,12 @@ IOReturn IOAudioEngine::detachUserClients()
 {
     IOReturn result = kIOReturnSuccess;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::detachUserClients\n", this);
+    DbgLog("+ IOAudioEngine[%p]::detachUserClients\n", this);
 
     assert(userClients);
     
     if (!isInactive()) {	// Iterate through and terminate each user client
-		audioDebugIOLog ( 3, "  !isInactive ()\n" );
+		DbgLog("  !isInactive ()\n" );
         OSIterator *iterator;
         
         iterator = OSCollectionIterator::withCollection(userClients);
@@ -1112,19 +1112,19 @@ IOReturn IOAudioEngine::detachUserClients()
             
             while ( (userClient = (IOAudioEngineUserClient *)iterator->getNextObject()) )
 			{
-				audioDebugIOLog ( 3, "  will invoke userClient->terminate ()\n" );
+				DbgLog("  will invoke userClient->terminate ()\n" );
                 userClient->terminate();
-				audioDebugIOLog ( 3, "  completed userClient->terminate ()\n" );
+				DbgLog("  completed userClient->terminate ()\n" );
             }
-			audioDebugIOLog ( 3, "  will invoke iterator->release ()\n" );
+			DbgLog("  will invoke iterator->release ()\n" );
             iterator->release();
-			audioDebugIOLog ( 3, "  completed iterator->release ()\n" );
+			DbgLog("  completed iterator->release ()\n" );
         }
     }
     
-	audioDebugIOLog ( 3, "  will invoke userClients->flushCollection ()\n" );
+	DbgLog("  will invoke userClients->flushCollection ()\n" );
     userClients->flushCollection();
-	audioDebugIOLog ( 3, "  completed userClients->flushCollection ()\n" );
+	DbgLog("  completed userClients->flushCollection ()\n" );
     
     if (getState() == kIOAudioEngineRunning) {
         IOAudioEnginePosition stopPosition;
@@ -1134,12 +1134,12 @@ IOReturn IOAudioEngine::detachUserClients()
         stopPosition.fSampleFrame = getCurrentSampleFrame();
         stopPosition.fLoopCount = status->fCurrentLoopCount + 1;
 
-		audioDebugIOLog ( 3, "  will invoke stopEngineAtPosition ()\n" );
+		DbgLog("  will invoke stopEngineAtPosition ()\n" );
         stopEngineAtPosition(&stopPosition);
-		audioDebugIOLog ( 3, "  completed stopEngineAtPosition ()\n" );
+		DbgLog("  completed stopEngineAtPosition ()\n" );
     }
     
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::detachUserClients returns 0x%lX\n", this, (long unsigned int)result );
+    DbgLog("- IOAudioEngine[%p]::detachUserClients returns 0x%lX\n", this, (long unsigned int)result );
     return result;
 }
 
@@ -1147,7 +1147,7 @@ IOReturn IOAudioEngine::startClient(IOAudioEngineUserClient *userClient)
 {
     IOReturn result = kIOReturnBadArgument;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::startClient(%p)\n", this, userClient);
+    DbgLog("+ IOAudioEngine[%p]::startClient(%p)\n", this, userClient);
 
 	while ( audioDevice->getPowerState() == kIOAudioDeviceSleep )
 	{
@@ -1213,7 +1213,7 @@ IOReturn IOAudioEngine::startClient(IOAudioEngineUserClient *userClient)
         result = incrementActiveUserClients();
     }
     
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::startClient(%p) returns 0x%lX\n", this, userClient, (long unsigned int)result );
+    DbgLog("- IOAudioEngine[%p]::startClient(%p) returns 0x%lX\n", this, userClient, (long unsigned int)result );
     return result;
 }
 
@@ -1221,7 +1221,7 @@ IOReturn IOAudioEngine::stopClient(IOAudioEngineUserClient *userClient)
 {
     IOReturn result = kIOReturnSuccess;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::stopClient(%p)\n", this, userClient);
+    DbgLog("+ IOAudioEngine[%p]::stopClient(%p)\n", this, userClient);
 
     if (userClient) {
         if (userClient->isOnline()) {
@@ -1231,7 +1231,7 @@ IOReturn IOAudioEngine::stopClient(IOAudioEngineUserClient *userClient)
         result = kIOReturnBadArgument;
     }
     
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::stopClient(%p) returns 0x%lX\n", this, userClient, (long unsigned int)result );
+    DbgLog("- IOAudioEngine[%p]::stopClient(%p) returns 0x%lX\n", this, userClient, (long unsigned int)result );
     return result;
 }
     
@@ -1239,7 +1239,7 @@ IOReturn IOAudioEngine::incrementActiveUserClients()
 {
     IOReturn result = kIOReturnSuccess;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::incrementActiveUserClients() - %ld\n", this, (long int)numActiveUserClients);
+    DbgLog("+ IOAudioEngine[%p]::incrementActiveUserClients() - %ld\n", this, (long int)numActiveUserClients);
     
     numActiveUserClients++;
 
@@ -1253,7 +1253,7 @@ IOReturn IOAudioEngine::incrementActiveUserClients()
 		decrementActiveUserClients();
 	}
 	
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::incrementActiveUserClients() - %ld returns %lX\n", this, (long int)numActiveUserClients, (long unsigned int)result );
+    DbgLog("- IOAudioEngine[%p]::incrementActiveUserClients() - %ld returns %lX\n", this, (long int)numActiveUserClients, (long unsigned int)result );
     return result;
 }
 
@@ -1261,7 +1261,7 @@ IOReturn IOAudioEngine::decrementActiveUserClients()
 {
     IOReturn result = kIOReturnSuccess;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::decrementActiveUserClients() - %ld\n", this, (long int)numActiveUserClients);
+    DbgLog("+ IOAudioEngine[%p]::decrementActiveUserClients() - %ld\n", this, (long int)numActiveUserClients);
     
     numActiveUserClients--;
     
@@ -1278,7 +1278,7 @@ IOReturn IOAudioEngine::decrementActiveUserClients()
         stopEngineAtPosition(&stopPosition);
     }
     
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::decrementActiveUserClients() - %ld returns 0x%lX\n", this, (long int)numActiveUserClients, (long unsigned int)result );
+    DbgLog("- IOAudioEngine[%p]::decrementActiveUserClients() - %ld returns 0x%lX\n", this, (long int)numActiveUserClients, (long unsigned int)result );
     return result;
 }
 
@@ -1290,7 +1290,7 @@ IOReturn IOAudioEngine::addAudioStream(IOAudioStream *stream)
 {
     IOReturn result = kIOReturnBadArgument;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::addAudioStream(%p)\n", this, stream);
+    DbgLog("+ IOAudioEngine[%p]::addAudioStream(%p)\n", this, stream);
 
     if (stream) {
 
@@ -1348,7 +1348,7 @@ IOReturn IOAudioEngine::addAudioStream(IOAudioStream *stream)
 		}
     }
 
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::addAudioStream(%p) returns 0x%lX\n", this, stream, (long unsigned int)result );
+    DbgLog("- IOAudioEngine[%p]::addAudioStream(%p) returns 0x%lX\n", this, stream, (long unsigned int)result );
     return result;
 }
 
@@ -1357,7 +1357,7 @@ void IOAudioEngine::detachAudioStreams()
     OSCollectionIterator *iterator;
     IOAudioStream *stream;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::detachAudioStreams()\n", this);
+    DbgLog("+ IOAudioEngine[%p]::detachAudioStreams()\n", this);
 
     if (outputStreams && (outputStreams->getCount() > 0)) {
         iterator = OSCollectionIterator::withCollection(outputStreams);
@@ -1397,7 +1397,7 @@ void IOAudioEngine::detachAudioStreams()
 		reserved->streams->flushCollection();
 	}
 	
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::detachAudioStreams()\n", this);
+    DbgLog("- IOAudioEngine[%p]::detachAudioStreams()\n", this);
 	return;
 }
 
@@ -1498,7 +1498,7 @@ void IOAudioEngine::updateChannelNumbers()
     SInt32 currentChannelNumber;
    
    
-	audioDebugIOLog ( 3, "+ IOAudioEngine[%p]::updateChannelNumbers ()\n", this );
+	DbgLog("+ IOAudioEngine[%p]::updateChannelNumbers ()\n", this );
 	
 	// BEGIN <rdar://6997438> maxNumOutputChannels may not represent the true number of output channels at this point
 	//					because the the number of formats in the stream may have changed. We recalculate the correct value here.
@@ -1533,7 +1533,7 @@ void IOAudioEngine::updateChannelNumbers()
 	}
 	// END <rdar://6997438>
 	
-	audioDebugIOLog(3, "  o=%ld i=%ld\n", (long int)maxNumOutputChannels, (long int)maxNumInputChannels);
+	DbgLog("  o=%ld i=%ld\n", (long int)maxNumOutputChannels, (long int)maxNumInputChannels);
 	
     if (maxNumOutputChannels > 0) {
         outputChannelNumbers = (SInt32 *)IOMallocAligned(maxNumOutputChannels * sizeof(SInt32), sizeof (SInt32));
@@ -1694,7 +1694,7 @@ void IOAudioEngine::updateChannelNumbers()
         IOFreeAligned(inputChannelNumbers, maxNumInputChannels * sizeof(SInt32));
     }
 
-	audioDebugIOLog ( 3, "- IOAudioEngine[%p]::updateChannelNumbers ()\n", this );
+	DbgLog("- IOAudioEngine[%p]::updateChannelNumbers ()\n", this );
 	return;
 }
 
@@ -1702,7 +1702,7 @@ IOReturn IOAudioEngine::startAudioEngine()
 {
     IOReturn result = kIOReturnSuccess;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::startAudioEngine(state = %d)\n", this, getState());
+    DbgLog("+ IOAudioEngine[%p]::startAudioEngine(state = %d)\n", this, getState());
 
     switch(getState()) {
         case kIOAudioEnginePaused:
@@ -1726,7 +1726,7 @@ IOReturn IOAudioEngine::startAudioEngine()
             break;
     }
     
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::startAudioEngine() returns 0x%lX\n", this, (long unsigned int)result );
+    DbgLog("- IOAudioEngine[%p]::startAudioEngine() returns 0x%lX\n", this, (long unsigned int)result );
     return result;
 }
 
@@ -1734,7 +1734,7 @@ IOReturn IOAudioEngine::stopAudioEngine()
 {
     IOReturn result = kIOReturnSuccess;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::stopAudioEngine()\n", this);
+    DbgLog("+ IOAudioEngine[%p]::stopAudioEngine()\n", this);
 
     switch (getState()) {
         case kIOAudioEngineRunning:
@@ -1752,7 +1752,7 @@ IOReturn IOAudioEngine::stopAudioEngine()
             break;
     }
         
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::stopAudioEngine() returns 0x%lX\n", this, (long unsigned int)result );
+    DbgLog("- IOAudioEngine[%p]::stopAudioEngine() returns 0x%lX\n", this, (long unsigned int)result );
     return result;
 }
 
@@ -1760,7 +1760,7 @@ IOReturn IOAudioEngine::pauseAudioEngine()
 {
     IOReturn result = kIOReturnSuccess;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::pauseAudioEngine()\n", this);
+    DbgLog("+ IOAudioEngine[%p]::pauseAudioEngine()\n", this);
 
 	reserved->pauseCount++;
     switch(getState()) {
@@ -1784,7 +1784,7 @@ IOReturn IOAudioEngine::pauseAudioEngine()
             break;
     }
     
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::pauseAudioEngine() returns 0x%lX\n", this, (long unsigned int)result );
+    DbgLog("- IOAudioEngine[%p]::pauseAudioEngine() returns 0x%lX\n", this, (long unsigned int)result );
     return result;
 }
 
@@ -1792,7 +1792,7 @@ IOReturn IOAudioEngine::resumeAudioEngine()
 {
     IOReturn result = kIOReturnSuccess;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::resumeAudioEngine()\n", this);
+    DbgLog("+ IOAudioEngine[%p]::resumeAudioEngine()\n", this);
 	
 	if (0 != reserved->pauseCount) {
 		if (0 == --reserved->pauseCount) {
@@ -1803,10 +1803,10 @@ IOReturn IOAudioEngine::resumeAudioEngine()
 		}
 	}
 	else {
-		audioDebugIOLog(1, "  attempting to resume while not paused\n" );
+		DbgLog("  attempting to resume while not paused\n" );
 	}
     
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::resumeAudioEngine() returns 0x%lX\n", this, (long unsigned int)result  );
+    DbgLog("- IOAudioEngine[%p]::resumeAudioEngine() returns 0x%lX\n", this, (long unsigned int)result  );
     return result;
 }
 
@@ -1822,14 +1822,14 @@ IOReturn IOAudioEngine::performAudioEngineStop()
 
 const IOAudioEngineStatus *IOAudioEngine::getStatus()
 {
-    audioDebugIOLog(3, "+-IOAudioEngine[%p]::getStatus()\n", this);
+    DbgLog("+-IOAudioEngine[%p]::getStatus()\n", this);
 
     return status;
 }
 
 void IOAudioEngine::setNumSampleFramesPerBuffer(UInt32 numSampleFrames)
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::setNumSampleFramesPerBuffer(0x%lx)\n", this, (long unsigned int)numSampleFrames);
+    DbgLog("+ IOAudioEngine[%p]::setNumSampleFramesPerBuffer(0x%lx)\n", this, (long unsigned int)numSampleFrames);
 
     if (getState() == kIOAudioEngineRunning) {
         IOLog("IOAudioEngine[%p]::setNumSampleFramesPerBuffer(0x%ld) - Error: can't change num sample frames while engine is running.\n", this, (long int) numSampleFrames);
@@ -1852,13 +1852,13 @@ void IOAudioEngine::setNumSampleFramesPerBuffer(UInt32 numSampleFrames)
             }
         }
     }
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::setNumSampleFramesPerBuffer(0x%lx)\n", this, (long unsigned int)numSampleFrames);
+    DbgLog("- IOAudioEngine[%p]::setNumSampleFramesPerBuffer(0x%lx)\n", this, (long unsigned int)numSampleFrames);
 	return;
 }
 
 UInt32 IOAudioEngine::getNumSampleFramesPerBuffer()
 {
-    audioDebugIOLog(7, "+-IOAudioEngine[%p]::getNumSampleFramesPerBuffer() returns %ld\n", this, (long int)numSampleFramesPerBuffer );
+    DbgLog("+-IOAudioEngine[%p]::getNumSampleFramesPerBuffer() returns %ld\n", this, (long int)numSampleFramesPerBuffer );
 
     return numSampleFramesPerBuffer;
 }
@@ -1872,7 +1872,7 @@ IOAudioEngineState IOAudioEngine::setState(IOAudioEngineState newState)
 {
     IOAudioEngineState oldState;
 
-    audioDebugIOLog(3, "+-IOAudioEngine[%p]::setState(0x%x. oldState=%#x)\n", this, newState, state);
+    DbgLog("+-IOAudioEngine[%p]::setState(0x%x. oldState=%#x)\n", this, newState, state);
 
     oldState = state;
     state = newState;
@@ -1907,7 +1907,7 @@ void IOAudioEngine::setSampleRate(const IOAudioSampleRate *newSampleRate)
 {
     OSDictionary *sampleRateDict;
     
-    audioDebugIOLog(3, "+-IOAudioEngine[%p]::setSampleRate(%p)\n", this, newSampleRate);
+    DbgLog("+-IOAudioEngine[%p]::setSampleRate(%p)\n", this, newSampleRate);
 
     sampleRate = *newSampleRate;
     
@@ -1944,47 +1944,47 @@ IOReturn IOAudioEngine::hardwareSampleRateChanged(const IOAudioSampleRate *newSa
 
 void IOAudioEngine::setSampleLatency(UInt32 numSamples)
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::setSampleLatency(0x%lx)\n", this, (long unsigned int)numSamples);
+    DbgLog("+ IOAudioEngine[%p]::setSampleLatency(0x%lx)\n", this, (long unsigned int)numSamples);
     setOutputSampleLatency(numSamples);
     setInputSampleLatency(numSamples);
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::setSampleLatency(0x%lx)\n", this, (long unsigned int)numSamples);
+    DbgLog("- IOAudioEngine[%p]::setSampleLatency(0x%lx)\n", this, (long unsigned int)numSamples);
 	return;
 }
 
 void IOAudioEngine::setOutputSampleLatency(UInt32 numSamples)
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::setOutputSampleLatency(0x%lx)\n", this, (long unsigned int)numSamples);
+    DbgLog("+ IOAudioEngine[%p]::setOutputSampleLatency(0x%lx)\n", this, (long unsigned int)numSamples);
     setProperty(kIOAudioEngineOutputSampleLatencyKey, numSamples, sizeof(UInt32)*8);
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::setOutputSampleLatency(0x%lx)\n", this, (long unsigned int)numSamples);
+    DbgLog("- IOAudioEngine[%p]::setOutputSampleLatency(0x%lx)\n", this, (long unsigned int)numSamples);
 	return;
 }
 
 void IOAudioEngine::setInputSampleLatency(UInt32 numSamples)
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::setInputSampleLatency(0x%lx)\n", this, (long unsigned int)numSamples);
+    DbgLog("+ IOAudioEngine[%p]::setInputSampleLatency(0x%lx)\n", this, (long unsigned int)numSamples);
     setProperty(kIOAudioEngineInputSampleLatencyKey, numSamples, sizeof(UInt32)*8);
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::setInputSampleLatency(0x%lx)\n", this, (long unsigned int)numSamples);
+    DbgLog("- IOAudioEngine[%p]::setInputSampleLatency(0x%lx)\n", this, (long unsigned int)numSamples);
 	return;
 }
 
 void IOAudioEngine::setSampleOffset(UInt32 numSamples)
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::setSampleOffset(0x%lx)\n", this, (long unsigned int)numSamples);
+    DbgLog("+ IOAudioEngine[%p]::setSampleOffset(0x%lx)\n", this, (long unsigned int)numSamples);
     sampleOffset = numSamples;
     setProperty(kIOAudioEngineSampleOffsetKey, numSamples, sizeof(UInt32)*8);
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::setSampleOffset(0x%lx)\n", this, (long unsigned int)numSamples);
+    DbgLog("- IOAudioEngine[%p]::setSampleOffset(0x%lx)\n", this, (long unsigned int)numSamples);
 	return;
 }
 
 void IOAudioEngine::setRunEraseHead(bool erase)
 {
-    audioDebugIOLog(3, "+-IOAudioEngine[%p]::setRunEraseHead(%d)\n", this, erase);
+    DbgLog("+-IOAudioEngine[%p]::setRunEraseHead(%d)\n", this, erase);
     runEraseHead = erase;
 }
 
 bool IOAudioEngine::getRunEraseHead()
 {
-    audioDebugIOLog(7, "+-IOAudioEngine[%p]::getRunEraseHead()\n", this);
+    DbgLog("+-IOAudioEngine[%p]::getRunEraseHead()\n", this);
 
     return runEraseHead;
 }
@@ -1994,16 +1994,16 @@ AbsoluteTime IOAudioEngine::getTimerInterval()
     AbsoluteTime interval;
     const IOAudioSampleRate *currentRate;
     
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::getTimerInterval()\n", this);
+    DbgLog("+ IOAudioEngine[%p]::getTimerInterval()\n", this);
 
     assert(status);
 
     currentRate = getSampleRate();
     
     if ((getNumSampleFramesPerBuffer() == 0) || (currentRate && (currentRate->whole == 0))) {
-        nanoseconds_to_absolutetime(NSEC_PER_SEC, &interval);
+        nanoseconds_to_absolutetime(NSEC_PER_SEC, (uint64_t *)&interval);
     } else if ((numErasesPerBuffer == 0) || (!getRunEraseHead())) {	// Run once per ring buffer
-        nanoseconds_to_absolutetime(((UInt64)NSEC_PER_SEC * (UInt64)getNumSampleFramesPerBuffer() / (UInt64)currentRate->whole), &interval);
+        nanoseconds_to_absolutetime(((UInt64)NSEC_PER_SEC * (UInt64)getNumSampleFramesPerBuffer() / (UInt64)currentRate->whole), (uint64_t *)&interval);
     } else {
         OSCollectionIterator *outputIterator;
         IOAudioStream *outputStream;
@@ -2025,9 +2025,9 @@ AbsoluteTime IOAudioEngine::getTimerInterval()
 			}
 			outputIterator->release();
 		}
-		nanoseconds_to_absolutetime(((UInt64)NSEC_PER_SEC * (UInt64)getNumSampleFramesPerBuffer() / (UInt64)currentRate->whole / (UInt64)numErasesPerBuffer), &interval);
+		nanoseconds_to_absolutetime(((UInt64)NSEC_PER_SEC * (UInt64)getNumSampleFramesPerBuffer() / (UInt64)currentRate->whole / (UInt64)numErasesPerBuffer), (uint64_t *)&interval);
     }
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::getTimerInterval()\n", this);
+    DbgLog("- IOAudioEngine[%p]::getTimerInterval()\n", this);
     return interval;
 }
 
@@ -2035,31 +2035,31 @@ void IOAudioEngine::timerCallback(OSObject *target, IOAudioDevice *device)
 {
     IOAudioEngine *audioEngine;
 
-    audioDebugIOLog(7, "+ IOAudioEngine::timerCallback(%p, %p)\n", target, device);
+    DbgLog("+ IOAudioEngine::timerCallback(%p, %p)\n", target, device);
 
     audioEngine = OSDynamicCast(IOAudioEngine, target);
     if (audioEngine) {
         audioEngine->timerFired();
     }
-    audioDebugIOLog(7, "- IOAudioEngine::timerCallback(%p, %p)\n", target, device);
+    DbgLog("- IOAudioEngine::timerCallback(%p, %p)\n", target, device);
 	return;
 }
 
 void IOAudioEngine::timerFired()
 {
-    audioDebugIOLog(7, "+ IOAudioEngine[%p]::timerFired()\n", this);
+    DbgLog("+ IOAudioEngine[%p]::timerFired()\n", this);
 
     performErase();
     performFlush();
 	
-    audioDebugIOLog(7, "- IOAudioEngine[%p]::timerFired()\n", this);
+    DbgLog("- IOAudioEngine[%p]::timerFired()\n", this);
 	return;
 }
 
 // <rdar://12188841>
 void IOAudioEngine::performErase()
 {
-    audioDebugIOLog(7, "+ IOAudioEngine[%p]::performErase()\n", this);
+    DbgLog("+ IOAudioEngine[%p]::performErase()\n", this);
 
     assert(status);
     
@@ -2097,8 +2097,8 @@ void IOAudioEngine::performErase()
 							(numSampleFramesPerBuffer * sampleBufferFrameSize <= outputStream->getSampleBufferSize() ) &&
 							((numSampleFramesPerBuffer * mixBufferFrameSize <= outputStream->getMixBufferSize() ) || !mixBuf ) &&	//	<rdar://10866244> Don't check mix buffer if it's not in use (eg. !fIsMixable)
 							(numSampleFramesPerBuffer > eraseHeadSampleFrame)) ) {
-						audioDebugIOLog(7, "IOAudioEngine[%p]::performErase() - erasing from frame: 0x%lx to 0x%lx\n", this, (long unsigned int)eraseHeadSampleFrame, (long unsigned int)numSampleFramesPerBuffer);
-						audioDebugIOLog(7, "IOAudioEngine[%p]::performErase() - erasing from frame: 0x%x to 0x%lx\n", this, 0, (long unsigned int)currentSampleFrame);
+						DbgLog("IOAudioEngine[%p]::performErase() - erasing from frame: 0x%lx to 0x%lx\n", this, (long unsigned int)eraseHeadSampleFrame, (long unsigned int)numSampleFramesPerBuffer);
+						DbgLog("IOAudioEngine[%p]::performErase() - erasing from frame: 0x%x to 0x%lx\n", this, 0, (long unsigned int)currentSampleFrame);
 						eraseOutputSamples(mixBuf, sampleBuf, 0, currentSampleFrame, &outputStream->format, outputStream);
 						eraseOutputSamples(mixBuf, sampleBuf, eraseHeadSampleFrame, numSampleFramesPerBuffer - eraseHeadSampleFrame, &outputStream->format, outputStream);
 					}
@@ -2107,7 +2107,7 @@ void IOAudioEngine::performErase()
 					if (	(outputStream->getSampleBufferSize() == 0) ||                       									//  <rdar://10905878> Don't use more stringent test if a driver is incorrectly reporting buffer size
 							( (currentSampleFrame * sampleBufferFrameSize <= outputStream->getSampleBufferSize() ) &&
 							( (currentSampleFrame * mixBufferFrameSize <= outputStream->getMixBufferSize() ) || !mixBuf ) ) ) {		//	<rdar://10866244> Don't check mix buffer if it's not in use (eg. !fIsMixable)
-						audioDebugIOLog(7, "IOAudioEngine[%p]::performErase() - erasing from frame: 0x%lx to 0x%lx\n", this, (long unsigned int)eraseHeadSampleFrame, (long unsigned int)currentSampleFrame);
+						DbgLog("IOAudioEngine[%p]::performErase() - erasing from frame: 0x%lx to 0x%lx\n", this, (long unsigned int)eraseHeadSampleFrame, (long unsigned int)currentSampleFrame);
 						eraseOutputSamples(mixBuf, sampleBuf, eraseHeadSampleFrame, currentSampleFrame - eraseHeadSampleFrame, &outputStream->format, outputStream);
 					}
 				}
@@ -2120,13 +2120,13 @@ void IOAudioEngine::performErase()
 		status->fEraseHeadSampleFrame = currentSampleFrame;
     }
 
-    audioDebugIOLog(7, "- IOAudioEngine[%p]::performErase()\n", this);
+    DbgLog("- IOAudioEngine[%p]::performErase()\n", this);
 	return;
 }
 
 void IOAudioEngine::stopEngineAtPosition(IOAudioEnginePosition *endingPosition)
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::stopEngineAtPosition(%lx,%lx)\n", this, endingPosition ? (long unsigned int)endingPosition->fLoopCount : 0, endingPosition ? (long unsigned int)endingPosition->fSampleFrame : 0);
+    DbgLog("+ IOAudioEngine[%p]::stopEngineAtPosition(%lx,%lx)\n", this, endingPosition ? (long unsigned int)endingPosition->fLoopCount : 0, endingPosition ? (long unsigned int)endingPosition->fSampleFrame : 0);
 
     if (endingPosition) {
         audioEngineStopPosition = *endingPosition;
@@ -2135,13 +2135,13 @@ void IOAudioEngine::stopEngineAtPosition(IOAudioEnginePosition *endingPosition)
         audioEngineStopPosition.fSampleFrame = 0;
     }
 	
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::stopEngineAtPosition(%lx,%lx)\n", this, endingPosition ? (long unsigned int)endingPosition->fLoopCount : 0, endingPosition ? (long unsigned int)endingPosition->fSampleFrame : 0);
+    DbgLog("- IOAudioEngine[%p]::stopEngineAtPosition(%lx,%lx)\n", this, endingPosition ? (long unsigned int)endingPosition->fLoopCount : 0, endingPosition ? (long unsigned int)endingPosition->fSampleFrame : 0);
 	return;
 }
 
 void IOAudioEngine::performFlush()
 {
-    audioDebugIOLog(6, "+ IOAudioEngine[%p]::performFlush()\n", this);
+    DbgLog("+ IOAudioEngine[%p]::performFlush()\n", this);
 
     if ((numActiveUserClients == 0) && (getState() == kIOAudioEngineRunning)) {
         IOAudioEnginePosition currentPosition;
@@ -2156,7 +2156,7 @@ void IOAudioEngine::performFlush()
         }
     }
 	
-    audioDebugIOLog(6, "- IOAudioEngine[%p]::performFlush()\n", this);
+    DbgLog("- IOAudioEngine[%p]::performFlush()\n", this);
 	return;
 }
 
@@ -2166,14 +2166,14 @@ void IOAudioEngine::performFlush()
 
 void IOAudioEngine::addTimer()
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::addTimer()\n", this);
+    DbgLog("+ IOAudioEngine[%p]::addTimer()\n", this);
 
     if ( audioDevice )
 	{
 		audioDevice->addTimerEvent(this, &IOAudioEngine::timerCallback, getTimerInterval());
     }
 
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::addTimer()\n", this);
+    DbgLog("- IOAudioEngine[%p]::addTimer()\n", this);
 	return;
 }
 
@@ -2183,27 +2183,27 @@ void IOAudioEngine::addTimer()
 
 void IOAudioEngine::removeTimer()
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::removeTimer()\n", this);
+    DbgLog("+ IOAudioEngine[%p]::removeTimer()\n", this);
 
     if ( audioDevice )
 	{
 		audioDevice->removeTimerEvent(this);
     }
 
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::removeTimer()\n", this);
+    DbgLog("- IOAudioEngine[%p]::removeTimer()\n", this);
 	return;
 }
 
 IOReturn IOAudioEngine::clipOutputSamples(const void *mixBuf, void *sampleBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream)
 {
-    audioDebugIOLog(6, "+-IOAudioEngine[%p]::clipOutputSamples(%p, %p, 0x%lx, 0x%lx, %p, %p)\n", this, mixBuf, sampleBuf, (long unsigned int)firstSampleFrame, (long unsigned int)numSampleFrames, streamFormat, audioStream);
+    DbgLog("+-IOAudioEngine[%p]::clipOutputSamples(%p, %p, 0x%lx, 0x%lx, %p, %p)\n", this, mixBuf, sampleBuf, (long unsigned int)firstSampleFrame, (long unsigned int)numSampleFrames, streamFormat, audioStream);
 
     return kIOReturnUnsupported;
 }
 
 void IOAudioEngine::resetClipPosition(IOAudioStream *audioStream, UInt32 clipSampleFrame)
 {
-    audioDebugIOLog(6, "+-IOAudioEngine[%p]::resetClipPosition(%p, 0x%lx)\n", this, audioStream, (long unsigned int)clipSampleFrame);
+    DbgLog("+-IOAudioEngine[%p]::resetClipPosition(%p, 0x%lx)\n", this, audioStream, (long unsigned int)clipSampleFrame);
 
     return;
 }
@@ -2211,7 +2211,7 @@ void IOAudioEngine::resetClipPosition(IOAudioStream *audioStream, UInt32 clipSam
 
 IOReturn IOAudioEngine::convertInputSamples(const void *sampleBuf, void *destBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream)
 {
-    audioDebugIOLog(6, "+-IOAudioEngine[%p]::convertInputSamples(%p, %p, 0x%lx, 0x%lx, %p, %p)\n", this, sampleBuf, destBuf, (long unsigned int)firstSampleFrame, (long unsigned int)numSampleFrames, streamFormat, audioStream);
+    DbgLog("+-IOAudioEngine[%p]::convertInputSamples(%p, %p, 0x%lx, 0x%lx, %p, %p)\n", this, sampleBuf, destBuf, (long unsigned int)firstSampleFrame, (long unsigned int)numSampleFrames, streamFormat, audioStream);
 
     return kIOReturnUnsupported;
 }
@@ -2223,7 +2223,7 @@ void IOAudioEngine::takeTimeStamp(bool incrementLoopCount, AbsoluteTime *timesta
     if (timestamp) {
         ts = timestamp;
     } else {
-        clock_get_uptime(&uptime);
+        clock_get_uptime((uint64_t *)&uptime);
         ts = &uptime;
     }
     
@@ -2323,7 +2323,7 @@ IOReturn IOAudioEngine::calculateSampleTimeout(AbsoluteTime *sampleInterval, UIn
         //wakeupInterval = scalar_to_AbsoluteTime(&wakeupIntervalScalar);
         wakeupInterval = *(AbsoluteTime *)(&wakeupIntervalScalar);
         
-        nanoseconds_to_absolutetime(WATCHDOG_THREAD_LATENCY_PADDING_NS, &wakeupThreadLatencyPaddingInterval);
+        nanoseconds_to_absolutetime(WATCHDOG_THREAD_LATENCY_PADDING_NS, (uint64_t *)&wakeupThreadLatencyPaddingInterval);
         
         SUB_ABSOLUTETIME(&wakeupInterval, &wakeupThreadLatencyPaddingInterval);
         
@@ -2331,7 +2331,7 @@ IOReturn IOAudioEngine::calculateSampleTimeout(AbsoluteTime *sampleInterval, UIn
         ADD_ABSOLUTETIME(wakeupTime, &wakeupInterval);
 
 		// <rdar://10145205> Sanity check the calculated time
-		clock_get_uptime(&currentTime);
+		clock_get_uptime((uint64_t *)&currentTime);
 		
 		if ( CMP_ABSOLUTETIME(wakeupTime, &currentTime) > 0 ) {
 	        result = kIOReturnSuccess;
@@ -2346,14 +2346,14 @@ IOReturn IOAudioEngine::calculateSampleTimeout(AbsoluteTime *sampleInterval, UIn
 
 IOReturn IOAudioEngine::performFormatChange(IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate)
 {
-    audioDebugIOLog(3, "+-IOAudioEngine[%p]::performFormatChange(%p, %p, %p)\n", this, audioStream, newFormat, newSampleRate);
+    DbgLog("+-IOAudioEngine[%p]::performFormatChange(%p, %p, %p)\n", this, audioStream, newFormat, newSampleRate);
 
     return kIOReturnSuccess;
 }
 
 void IOAudioEngine::sendFormatChangeNotification(IOAudioStream *audioStream)
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::sendFormatChangeNotification(%p)\n", this, audioStream);
+    DbgLog("+ IOAudioEngine[%p]::sendFormatChangeNotification(%p)\n", this, audioStream);
 
     if (!configurationChangeInProgress) {
         OSCollectionIterator *userClientIterator;
@@ -2371,7 +2371,7 @@ void IOAudioEngine::sendFormatChangeNotification(IOAudioStream *audioStream)
         }
     }
 	
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::sendFormatChangeNotification(%p)\n", this, audioStream);
+    DbgLog("- IOAudioEngine[%p]::sendFormatChangeNotification(%p)\n", this, audioStream);
 	return;
 }
 
@@ -2394,14 +2394,14 @@ void IOAudioEngine::sendNotification(UInt32 notificationType)
 
 void IOAudioEngine::beginConfigurationChange()
 {
-    audioDebugIOLog(3, "+-IOAudioEngine[%p]::beginConfigurationChange()\n", this);
+    DbgLog("+-IOAudioEngine[%p]::beginConfigurationChange()\n", this);
 
     configurationChangeInProgress = true;
 }
 
 void IOAudioEngine::completeConfigurationChange()
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::completeConfigurationChange()\n", this);
+    DbgLog("+ IOAudioEngine[%p]::completeConfigurationChange()\n", this);
 
     if (configurationChangeInProgress) {
         configurationChangeInProgress = false;
@@ -2427,13 +2427,13 @@ void IOAudioEngine::completeConfigurationChange()
 		}
     }
 	
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::completeConfigurationChange()\n", this);
+    DbgLog("- IOAudioEngine[%p]::completeConfigurationChange()\n", this);
 	return;
 }
 
 void IOAudioEngine::cancelConfigurationChange()
 {
-    audioDebugIOLog(3, "+-IOAudioEngine[%p]::cancelConfigurationChange()\n", this);
+    DbgLog("+-IOAudioEngine[%p]::cancelConfigurationChange()\n", this);
 
     configurationChangeInProgress = false;
 }
@@ -2503,7 +2503,7 @@ IOReturn IOAudioEngine::removeDefaultAudioControl(IOAudioControl *defaultAudioCo
 
 void IOAudioEngine::removeAllDefaultAudioControls()
 {
-    audioDebugIOLog(3, "+ IOAudioEngine[%p]::removeAllDefaultAudioControls()\n", this);
+    DbgLog("+ IOAudioEngine[%p]::removeAllDefaultAudioControls()\n", this);
 
     if (defaultAudioControls) {
         if (!isInactive()) {
@@ -2529,7 +2529,7 @@ void IOAudioEngine::removeAllDefaultAudioControls()
         defaultAudioControls->flushCollection();
     }
 	
-    audioDebugIOLog(3, "- IOAudioEngine[%p]::removeAllDefaultAudioControls()\n", this);
+    DbgLog("- IOAudioEngine[%p]::removeAllDefaultAudioControls()\n", this);
 	return;
 }
 

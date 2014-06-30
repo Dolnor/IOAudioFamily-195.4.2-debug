@@ -30,14 +30,6 @@
 	<string>1.1d25</string>
 	<key>OSBundleLibraries</key>
 	<dict>
-#ifdef DEBUG
-#if 0
-		<key>com.apple.FireLog</key>
-		<string>2.0.0</string>		
-		<key>com.apple.iokit.IOUSBFamily</key>
-		<string>1.9.4fc1</string>
-#endif
-#endif		
 		<key>com.apple.kpi.iokit</key>
 		<string>9.0.0d1</string>
 		<key>com.apple.kpi.libkern</key>

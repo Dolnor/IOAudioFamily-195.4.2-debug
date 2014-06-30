@@ -104,12 +104,12 @@ OSMetaClassDefineReservedUnused(IOAudioDevice, 31);
 // New code added here
 void IOAudioDevice::setDeviceModelName(const char *modelName)
 {
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::setDeviceModelName(%p)\n", this, modelName);
+    deviceDbgLog("+ IOAudioDevice[%p]::setDeviceModelName(%p)\n", this, modelName);
 
     if (modelName) {
         setProperty(kIOAudioDeviceModelIDKey, modelName);
     }
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::setDeviceModelName(%p)\n", this, modelName);
+    deviceDbgLog("- IOAudioDevice[%p]::setDeviceModelName(%p)\n", this, modelName);
 }
 
 void IOAudioDevice::setDeviceTransportType(const UInt32 transportType)
@@ -131,7 +131,7 @@ void IOAudioDevice::setIdleAudioSleepTime(unsigned long long sleepDelay)
 {
 	assert(reserved);
 	
-	audioDebugIOLog(3, "+ IOAudioDevice[%p]::setIdleAudioSleepTime: sleepDelay = %lx%lx\n", this, (long unsigned int)(sleepDelay >> 32), (long unsigned int)sleepDelay);
+	deviceDbgLog("+ IOAudioDevice[%p]::setIdleAudioSleepTime: sleepDelay = %lx%lx\n", this, (long unsigned int)(sleepDelay >> 32), (long unsigned int)sleepDelay);
 	
 	if ( reserved->idleTimer ) {
 		reserved->idleTimer->cancelTimeout();
@@ -144,7 +144,7 @@ void IOAudioDevice::setIdleAudioSleepTime(unsigned long long sleepDelay)
 	if ( kNoIdleAudioPowerDown != sleepDelay ) {
 		scheduleIdleAudioSleep();
 	}
-	audioDebugIOLog(3, "- IOAudioDevice[%p]::setIdleAudioSleepTime: sleepDelay = %lx%lx\n", this, (long unsigned int)(sleepDelay >> 32), (long unsigned int)sleepDelay);
+	deviceDbgLog("- IOAudioDevice[%p]::setIdleAudioSleepTime: sleepDelay = %lx%lx\n", this, (long unsigned int)(sleepDelay >> 32), (long unsigned int)sleepDelay);
 }
 
 // Set up a timer to power down the hardware if we haven't used it in a while.
@@ -160,7 +160,7 @@ void IOAudioDevice::scheduleIdleAudioSleep(void)
 
 	assert(reserved);
 
-	audioDebugIOLog(3, "+ IOAudioDevice[%p]::scheduleIdleAudioSleep: idleSleepDelayTime = %lx%lx\n", this, (long unsigned int)(reserved->idleSleepDelayTime >> 32), (long unsigned int)reserved->idleSleepDelayTime);
+	deviceDbgLog("+ IOAudioDevice[%p]::scheduleIdleAudioSleep: idleSleepDelayTime = %lx%lx\n", this, (long unsigned int)(reserved->idleSleepDelayTime >> 32), (long unsigned int)reserved->idleSleepDelayTime);
 	if ( 0 == reserved->idleSleepDelayTime )
 	{
 		// For backwards compatibility, or drivers that don't care, tell them about idle right away.
@@ -185,15 +185,15 @@ void IOAudioDevice::scheduleIdleAudioSleep(void)
 		{
 			// If the driver wants to know about idle sleep after a specific amount of time, then set the timer to tell them at that time.
 			// If idleSleepDelayTime == 0xffffffff then don't ever tell the driver about going idle
-			clock_get_uptime ( &fireTime );
-			absolutetime_to_nanoseconds ( fireTime, &nanos );
+            clock_get_uptime ( (uint64_t *)&fireTime );
+            absolutetime_to_nanoseconds ( *((uint64_t *)&fireTime), &nanos );
 			nanos += reserved->idleSleepDelayTime;
-			nanoseconds_to_absolutetime ( nanos, &fireTime );
+			nanoseconds_to_absolutetime ( nanos, (uint64_t *)&fireTime );
 			reserved->idleTimer->wakeAtTime ( fireTime );		// will call idleAudioSleepHandlerTimer
 		}
 	}
 
-	audioDebugIOLog(3, "- IOAudioDevice[%p]::scheduleIdleAudioSleep: idleSleepDelayTime = %lx%lx\n", this, (long unsigned int)(reserved->idleSleepDelayTime >> 32), (long unsigned int)reserved->idleSleepDelayTime);
+	deviceDbgLog("- IOAudioDevice[%p]::scheduleIdleAudioSleep: idleSleepDelayTime = %lx%lx\n", this, (long unsigned int)(reserved->idleSleepDelayTime >> 32), (long unsigned int)reserved->idleSleepDelayTime);
 	return;
 }
 
@@ -204,25 +204,25 @@ void IOAudioDevice::idleAudioSleepHandlerTimer(OSObject *owner, IOTimerEventSour
 	audioDevice = OSDynamicCast(IOAudioDevice, owner);
 	assert(audioDevice);
 
-	audioDebugIOLog(3, "+ IOAudioDevice[%p]idleAudioSleepHandlerTimer: pendingPowerState = %d, idleSleepDelayTime = %lx%lx\n", audioDevice, audioDevice->pendingPowerState, (long unsigned int)(audioDevice->reserved->idleSleepDelayTime >> 32), (long unsigned int)audioDevice->reserved->idleSleepDelayTime);
+	deviceDbgLog("+ IOAudioDevice[%p]idleAudioSleepHandlerTimer: pendingPowerState = %d, idleSleepDelayTime = %lx%lx\n", audioDevice, audioDevice->pendingPowerState, (long unsigned int)(audioDevice->reserved->idleSleepDelayTime >> 32), (long unsigned int)audioDevice->reserved->idleSleepDelayTime);
 	if (audioDevice->reserved->idleSleepDelayTime != kNoIdleAudioPowerDown &&
 		audioDevice->getPendingPowerState () == kIOAudioDeviceIdle) {
 		// If we're still idle, tell the device to go idle now that the requested amount of time has elapsed.
 		audioDevice->initiatePowerStateChange();
 	}
 
-	audioDebugIOLog(3, "- IOAudioDevice[%p]idleAudioSleepHandlerTimer: pendingPowerState = %d, idleSleepDelayTime = %lx%lx\n", audioDevice, audioDevice->pendingPowerState, (long unsigned int)(audioDevice->reserved->idleSleepDelayTime >> 32), (long unsigned int)audioDevice->reserved->idleSleepDelayTime);
+	deviceDbgLog("- IOAudioDevice[%p]idleAudioSleepHandlerTimer: pendingPowerState = %d, idleSleepDelayTime = %lx%lx\n", audioDevice, audioDevice->pendingPowerState, (long unsigned int)(audioDevice->reserved->idleSleepDelayTime >> 32), (long unsigned int)audioDevice->reserved->idleSleepDelayTime);
 	return;
 }
 
 void IOAudioDevice::setConfigurationApplicationBundle(const char *bundleID)
 {
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::setConfigurationApplicationBundle(%p)\n", this, bundleID);
+    deviceDbgLog("+ IOAudioDevice[%p]::setConfigurationApplicationBundle(%p)\n", this, bundleID);
 
     if (bundleID) {
         setProperty(kIOAudioDeviceConfigurationAppKey, bundleID);
     }
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::setConfigurationApplicationBundle(%p)\n", this, bundleID);
+    deviceDbgLog("- IOAudioDevice[%p]::setConfigurationApplicationBundle(%p)\n", this, bundleID);
 }
 
 // OSMetaClassDefineReservedUsed(IOAudioDevice, 4);
@@ -239,7 +239,7 @@ bool IOAudioDevice::init(OSDictionary *properties)
 {
 	bool			result = false;
 	
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::init(%p)\n", this, properties);
+    deviceDbgLog("+ IOAudioDevice[%p]::init(%p)\n", this, properties);
 
 	if ( super::init ( properties ) )
 	{
@@ -273,13 +273,13 @@ bool IOAudioDevice::init(OSDictionary *properties)
 		}
 	}
     
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::init(%p) returns %d\n", this, properties, result);
+    deviceDbgLog("- IOAudioDevice[%p]::init(%p) returns %d\n", this, properties, result);
     return result;
 }
 
 void IOAudioDevice::free()
 {
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::free()\n", this);
+    deviceDbgLog("+ IOAudioDevice[%p]::free()\n", this);
 
     if (audioEngines) {
         deactivateAllAudioEngines();
@@ -287,7 +287,7 @@ void IOAudioDevice::free()
         audioEngines = 0;
     }
 	
-	audioDebugIOLog ( 3, "  did deactiveateAllAudioEngines ()\n" );
+	deviceDbgLog("  did deactiveateAllAudioEngines ()\n" );
 	
     if (audioPorts) {
         detachAllAudioPorts();
@@ -295,14 +295,14 @@ void IOAudioDevice::free()
         audioPorts = 0;
     }
     
-	audioDebugIOLog ( 3, "  did detachAllAudioPorts ()\n" );
+	deviceDbgLog("  did detachAllAudioPorts ()\n" );
 	
     if (timerEvents) {
         timerEvents->release();
         timerEvents = 0;
     }
 
-	audioDebugIOLog ( 3, "  did timerEvents->release ()\n" );
+	deviceDbgLog("  did timerEvents->release ()\n" );
 	
     if (timerEventSource) {
         if (workLoop) {
@@ -314,7 +314,7 @@ void IOAudioDevice::free()
         timerEventSource = NULL;
     }
 
-	audioDebugIOLog ( 3, "  did workLoop->removeEventSource ( timerEventSource )\n" );
+	deviceDbgLog("  did workLoop->removeEventSource ( timerEventSource )\n" );
 	
 	if (reserved->idleTimer) {
 		if (workLoop) {
@@ -326,7 +326,7 @@ void IOAudioDevice::free()
 		reserved->idleTimer = NULL;
 	}
 
-	audioDebugIOLog ( 3, "  did workLoop->removeEventSource ( reserved->idleTimer )\n" );
+	deviceDbgLog("  did workLoop->removeEventSource ( reserved->idleTimer )\n" );
 	
     if (commandGate) {
         if (workLoop) {
@@ -337,29 +337,29 @@ void IOAudioDevice::free()
         commandGate = NULL;
     }
 
-	audioDebugIOLog ( 3, "  did workLoop->removeEventSource ( commandGate )\n" );
+	deviceDbgLog("  did workLoop->removeEventSource ( commandGate )\n" );
 	
     if (workLoop) {
         workLoop->release();
         workLoop = NULL;
     }
 
-	audioDebugIOLog ( 3, "  did workLoop->release ()\n" );
+	deviceDbgLog("  did workLoop->release ()\n" );
 	
 	if (reserved) {
 		IOFree (reserved, sizeof(struct ExpansionData));
 	}
     
-	audioDebugIOLog ( 3, "  did IOFree ()\n" );
+	deviceDbgLog("  did IOFree ()\n" );
 	
     super::free();
 
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::free()\n", this);
+    deviceDbgLog("- IOAudioDevice[%p]::free()\n", this);
 }
 
 bool IOAudioDevice::initHardware(IOService *provider)
 {
-    audioDebugIOLog(3, "+-IOAudioDevice[%p]::initHardware(%p)\n", this, provider);
+    deviceDbgLog("+-IOAudioDevice[%p]::initHardware(%p)\n", this, provider);
 
     return true;
 }
@@ -377,7 +377,7 @@ bool IOAudioDevice::start(IOService *provider)
         {1, IOPMDeviceUsable, IOPMPowerOn, IOPMPowerOn, 0, 0, 0, 0, 0, 0, 0, 0}
     };
     
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::start(%p)\n", this, provider);
+    deviceDbgLog("+ IOAudioDevice[%p]::start(%p)\n", this, provider);
 	
 	if ( super::start ( provider ) )
 	{
@@ -415,13 +415,13 @@ bool IOAudioDevice::start(IOService *provider)
 		}
 	}
 	
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::start(%p)\n", this, provider);
+    deviceDbgLog("- IOAudioDevice[%p]::start(%p)\n", this, provider);
 	return result;
 }
 
 void IOAudioDevice::stop(IOService *provider)
 {    
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::stop(%p)\n", this, provider);
+    deviceDbgLog("+ IOAudioDevice[%p]::stop(%p)\n", this, provider);
     
     removeAllTimerEvents();					// <rdar://problem/7493627,8426296>
 
@@ -464,14 +464,14 @@ void IOAudioDevice::stop(IOService *provider)
     }
 
     super::stop(provider);
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::stop(%p)\n", this, provider);
+    deviceDbgLog("- IOAudioDevice[%p]::stop(%p)\n", this, provider);
 }
 
 bool IOAudioDevice::willTerminate(IOService *provider, IOOptionBits options)
 {
 	bool			result = false;
 	
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::willTerminate(%p, %lx)\n", this, provider, (long unsigned int)options);
+    deviceDbgLog("+ IOAudioDevice[%p]::willTerminate(%p, %lx)\n", this, provider, (long unsigned int)options);
 
     OSCollectionIterator *engineIterator;
     
@@ -486,7 +486,7 @@ bool IOAudioDevice::willTerminate(IOService *provider, IOOptionBits options)
     }
 
 	result = super::willTerminate(provider, options);
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::willTerminate(%p, %lx) returns %d\n", this, provider, (long unsigned int)options, result );
+    deviceDbgLog("- IOAudioDevice[%p]::willTerminate(%p, %lx) returns %d\n", this, provider, (long unsigned int)options, result );
 	return result;
 }
 
@@ -499,7 +499,7 @@ IOReturn IOAudioDevice::setPowerState(unsigned long powerStateOrdinal, IOService
 {
     IOReturn result = IOPMAckImplied;
     
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::setPowerState(%lu, %p)\n", this, powerStateOrdinal, device);
+    deviceDbgLog("+ IOAudioDevice[%p]::setPowerState(%lu, %p)\n", this, powerStateOrdinal, device);
     if (!duringStartup) 
 	{
         if (powerStateOrdinal >= NUM_POWER_STATES) 
@@ -513,7 +513,7 @@ IOReturn IOAudioDevice::setPowerState(unsigned long powerStateOrdinal, IOService
         }
     }
 	duringStartup = false;
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::setPowerState(%lu, %p) returns 0x%lX\n", this, powerStateOrdinal, device, (long unsigned int)result );
+    deviceDbgLog("- IOAudioDevice[%p]::setPowerState(%lu, %p) returns 0x%lX\n", this, powerStateOrdinal, device, (long unsigned int)result );
 	return result;
 }
 
@@ -557,7 +557,7 @@ IOReturn IOAudioDevice::protectedSetPowerState(unsigned long powerStateOrdinal, 
 {
     IOReturn result = IOPMAckImplied;
 
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::protectedSetPowerState(%lu, %p)\n", this, powerStateOrdinal, device);
+    deviceDbgLog("+ IOAudioDevice[%p]::protectedSetPowerState(%lu, %p)\n", this, powerStateOrdinal, device);
     
     if (asyncPowerStateChangeInProgress) {
         waitForPendingPowerStateChange();
@@ -605,13 +605,13 @@ IOReturn IOAudioDevice::protectedSetPowerState(unsigned long powerStateOrdinal, 
         }
     }
     
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::protectedSetPowerState(%lu, %p) returns 0x%lX\n", this, powerStateOrdinal, device, (long unsigned int)result );
+    deviceDbgLog("- IOAudioDevice[%p]::protectedSetPowerState(%lu, %p) returns 0x%lX\n", this, powerStateOrdinal, device, (long unsigned int)result );
     return result;
 }
 
 void IOAudioDevice::waitForPendingPowerStateChange()
 {
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::waitForPendingPowerStateChange()\n", this);
+    deviceDbgLog("+ IOAudioDevice[%p]::waitForPendingPowerStateChange()\n", this);
 
     if (asyncPowerStateChangeInProgress) {
         IOCommandGate *cg;
@@ -625,7 +625,7 @@ void IOAudioDevice::waitForPendingPowerStateChange()
             IOLog("IOAudioDevice[%p]::waitForPendingPowerStateChange() - internal error - unable to get the command gate.\n", this);
         }
     }
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::waitForPendingPowerStateChange()\n", this);
+    deviceDbgLog("- IOAudioDevice[%p]::waitForPendingPowerStateChange()\n", this);
 	return;
 }
 
@@ -633,7 +633,7 @@ IOReturn IOAudioDevice::initiatePowerStateChange(UInt32 *microsecondsUntilComple
 {
     IOReturn result = kIOReturnSuccess;
 
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::initiatePowerStateChange(%p) - current = %d - pending = %d\n", this, microsecondsUntilComplete, currentPowerState, pendingPowerState);
+    deviceDbgLog("+ IOAudioDevice[%p]::initiatePowerStateChange(%p) - current = %d - pending = %d\n", this, microsecondsUntilComplete, currentPowerState, pendingPowerState);
     
     if (currentPowerState != pendingPowerState) {
         UInt32 localMicsUntilComplete, *micsUntilComplete = NULL;
@@ -660,7 +660,7 @@ IOReturn IOAudioDevice::initiatePowerStateChange(UInt32 *microsecondsUntilComple
         }
     }
     
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::initiatePowerStateChange(%p) - current = %d - pending = %d returns 0x%lX\n", this, microsecondsUntilComplete, currentPowerState, pendingPowerState, (long unsigned int)result );
+    deviceDbgLog("- IOAudioDevice[%p]::initiatePowerStateChange(%p) - current = %d - pending = %d returns 0x%lX\n", this, microsecondsUntilComplete, currentPowerState, pendingPowerState, (long unsigned int)result );
     return result;
 }
 
@@ -697,7 +697,7 @@ IOReturn IOAudioDevice::protectedCompletePowerStateChange()
 {
     IOReturn result = kIOReturnSuccess;
 
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::protectedCompletePowerStateChange() - current = %d - pending = %d\n", this, currentPowerState, pendingPowerState);
+    deviceDbgLog("+ IOAudioDevice[%p]::protectedCompletePowerStateChange() - current = %d - pending = %d\n", this, currentPowerState, pendingPowerState);
 
     if (currentPowerState != pendingPowerState) {
 		IOCommandGate *cg;
@@ -706,7 +706,7 @@ IOReturn IOAudioDevice::protectedCompletePowerStateChange()
         // If we're waking, we fire off the timers and resync them
         // Then restart the audio engines that were running before the sleep
         if (currentPowerState == kIOAudioDeviceSleep) {	
-            clock_get_uptime(&previousTimerFire);
+            clock_get_uptime((uint64_t *)&previousTimerFire);
             SUB_ABSOLUTETIME(&previousTimerFire, &minimumInterval);
             
             if (timerEvents && (timerEvents->getCount() > 0)) {
@@ -748,7 +748,7 @@ IOReturn IOAudioDevice::protectedCompletePowerStateChange()
 		}
     }
     
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::protectedCompletePowerStateChange() - current = %d - pending = %d returns 0x%lX\n", this, currentPowerState, pendingPowerState, (long unsigned int)result );
+    deviceDbgLog("- IOAudioDevice[%p]::protectedCompletePowerStateChange() - current = %d - pending = %d returns 0x%lX\n", this, currentPowerState, pendingPowerState, (long unsigned int)result );
     return result;
 }
 
@@ -771,7 +771,7 @@ IOAudioDevicePowerState IOAudioDevice::getPendingPowerState()
 
 void IOAudioDevice::audioEngineStarting()
 {
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::audioEngineStarting() - numRunningAudioEngines = %ld\n", this, (long int)( numRunningAudioEngines + 1 ) );
+    deviceDbgLog("+ IOAudioDevice[%p]::audioEngineStarting() - numRunningAudioEngines = %ld\n", this, (long int)( numRunningAudioEngines + 1 ) );
 
     numRunningAudioEngines++;
     
@@ -793,12 +793,12 @@ void IOAudioDevice::audioEngineStarting()
             pendingPowerState = kIOAudioDeviceActive;
 		}
     }
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::audioEngineStarting() - numRunningAudioEngines = %ld\n", this, (long int)( numRunningAudioEngines + 1 ) );
+    deviceDbgLog("- IOAudioDevice[%p]::audioEngineStarting() - numRunningAudioEngines = %ld\n", this, (long int)( numRunningAudioEngines + 1 ) );
 }
 
 void IOAudioDevice::audioEngineStopped()
 {
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::audioEngineStopped() - numRunningAudioEngines = %ld\n", this, (long int)( numRunningAudioEngines - 1 ) );
+    deviceDbgLog("+ IOAudioDevice[%p]::audioEngineStopped() - numRunningAudioEngines = %ld\n", this, (long int)( numRunningAudioEngines - 1 ) );
 
     numRunningAudioEngines--;
     
@@ -813,7 +813,7 @@ void IOAudioDevice::audioEngineStopped()
 			scheduleIdleAudioSleep();
         }
     }
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::audioEngineStopped() - numRunningAudioEngines = %ld\n", this, (long int)( numRunningAudioEngines - 1 ) );
+    deviceDbgLog("- IOAudioDevice[%p]::audioEngineStopped() - numRunningAudioEngines = %ld\n", this, (long int)( numRunningAudioEngines - 1 ) );
 }
 
 IOWorkLoop *IOAudioDevice::getWorkLoop() const
@@ -828,7 +828,7 @@ IOCommandGate *IOAudioDevice::getCommandGate() const
 
 void IOAudioDevice::setDeviceName(const char *deviceName)
 {
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::setDeviceName(%p)\n", this, deviceName);
+    deviceDbgLog("+ IOAudioDevice[%p]::setDeviceName(%p)\n", this, deviceName);
 
     if (deviceName) {
         setProperty(kIOAudioDeviceNameKey, deviceName);
@@ -852,27 +852,27 @@ void IOAudioDevice::setDeviceName(const char *deviceName)
 			}
 		}
     }
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::setDeviceName(%p)\n", this, deviceName);
+    deviceDbgLog("- IOAudioDevice[%p]::setDeviceName(%p)\n", this, deviceName);
 }
 
 void IOAudioDevice::setDeviceShortName(const char *shortName)
 {
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::setDeviceShortName(%p)\n", this, shortName);
+    deviceDbgLog("+ IOAudioDevice[%p]::setDeviceShortName(%p)\n", this, shortName);
 
     if (shortName) {
         setProperty(kIOAudioDeviceShortNameKey, shortName);
     }
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::setDeviceShortName(%p)\n", this, shortName);
+    deviceDbgLog("- IOAudioDevice[%p]::setDeviceShortName(%p)\n", this, shortName);
 }
 
 void IOAudioDevice::setManufacturerName(const char *manufacturerName)
 {
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::setManufacturerName(%p)\n", this, manufacturerName);
+    deviceDbgLog("+ IOAudioDevice[%p]::setManufacturerName(%p)\n", this, manufacturerName);
 
     if (manufacturerName) {
         setProperty(kIOAudioDeviceManufacturerNameKey, manufacturerName);
     }
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::setManufacturerName(%p)\n", this, manufacturerName);
+    deviceDbgLog("- IOAudioDevice[%p]::setManufacturerName(%p)\n", this, manufacturerName);
 }
 
 IOReturn IOAudioDevice::activateAudioEngine(IOAudioEngine *audioEngine)
@@ -880,6 +880,124 @@ IOReturn IOAudioDevice::activateAudioEngine(IOAudioEngine *audioEngine)
     return activateAudioEngine(audioEngine, true);
 }
 
+/*
+class Mini9MuteControl : public IOAudioToggleControl
+{
+    	OSDeclareDefaultStructors(Mini9MuteControl);
+    
+    	IOMemoryDescriptor *ioreg_;
+    	bool mute_;
+    	static const IOPMPowerState kPowerStates[2];
+    
+    public:
+    	virtual bool start(IOService *provider) {
+        		IOAudioToggleControl::start(provider);
+        		// init power manager
+        		PMinit();
+        		registerPowerDriver(this, const_cast<IOPMPowerState*>(kPowerStates), sizeof(kPowerStates) / sizeof(kPowerStates[0]));
+        		provider->joinPMtree(this);
+        		return true;
+        	}
+    	virtual void stop(IOService *provider) {
+        		PMstop();
+        		IOAudioToggleControl::stop(provider);
+        	}
+    	virtual IOReturn setPowerState(unsigned long state, IOService *) {
+        		if (state != 0 && ! mute_) {
+            			::IODelay(100000); // nasty wait so that all initialization would finish before adjusting mute control
+            			updateMuteControl();
+            		}
+        		return kIOPMAckImplied;
+        	}
+        virtual IOReturn _setValue(OSObject *newValue) {
+            if (value != newValue) {
+                if (value) {
+                    value->release();
+                }
+                value = newValue;
+                value->retain();
+                }
+        
+                return kIOReturnSuccess;
+            }
+        virtual IOReturn performValueChange(OSObject *newValue) {
+        		OSNumber *v = OSDynamicCast(OSNumber, newValue);
+        		if (v == NULL) {
+            			IOLog("Mini9MuteControl: cast failure\n");
+            			return kIOReturnError;
+            		}
+        		mute_ = v->unsigned32BitValue() != 0;
+        		updateMuteControl();
+        		return kIOReturnSuccess;
+        	}
+    	static Mini9MuteControl *create() {
+        		Mini9MuteControl *control = new Mini9MuteControl;
+        		control->init();
+        		return control;
+        	}
+    	bool init() {
+        		mute_ = false;
+        		if (! IOAudioToggleControl::init(mute_, kIOAudioControlChannelIDAll, kIOAudioControlChannelNameAll, 0,
+                                                 				kIOAudioToggleControlSubTypeMute, kIOAudioControlUsageOutput)) {
+            			return false;
+            		}
+        		ioreg_ = NULL;
+        		return true;
+        	}
+    	void startUpdate() {
+        		IORegistryEntry *hdaDeviceEntry = IORegistryEntry::fromPath("IOService:/AppleACPIPlatformExpert/PCI0@0/AppleACPIPCI/HDEF@8");
+        		if (hdaDeviceEntry != NULL) {
+            			IOService *service = OSDynamicCast(IOService, hdaDeviceEntry);
+            			if (service != NULL && service->getDeviceMemoryCount() != 0) {
+                				ioreg_ = service->getDeviceMemoryWithIndex(0);
+                			}
+            			hdaDeviceEntry->release();
+                }
+                else
+                    IOLog("Mini9MuteControl: unable to locate HDEF device\n");
+        		//updateMuteControl();
+        	}
+    	void updateMuteControl() {
+        		if (ioreg_ == NULL) {
+            			return;
+            		}
+                UInt32 cmd = 0x01470c00 | (mute_ ? 0x0 : 0x2);
+            
+
+                for (int i = 0; i<2; i++) {
+
+                    // write the command
+                    IOLog("Mini9MuteControl: pushing verb %04x\n", cmd);
+                    ioreg_->writeBytes(0x60, &cmd, sizeof(cmd));
+                    UInt16 status = 1;
+                    ioreg_->writeBytes(0x68, &status, sizeof(status));
+                    // wait for response
+                    for (int i = 0; i < 1000; i++) {
+                            ::IODelay(100);
+                            ioreg_->readBytes(0x68, &status, sizeof(status));
+                            if (status & 0x2) {
+                                    goto Success;
+                                }
+                        }
+                    // timeout
+                    IOLog("Mini9MuteControl: request to change EAPD status timed out.\n");
+                Success:
+                    // clear Immediate Result Valid flag
+                    status = 0x2;
+                    ioreg_->writeBytes(0x68, &status, sizeof(status));
+                    cmd = 0x01570c00 | (mute_ ? 0x0 : 0x2);
+                }
+                IOLog("Mini9MuteControl: done\n");
+            }
+};
+
+OSDefineMetaClassAndStructors(Mini9MuteControl, IOAudioToggleControl)
+const IOPMPowerState Mini9MuteControl::kPowerStates[] = {
+    	{ kIOPMPowerStateVersion1 },
+    	{ kIOPMPowerStateVersion1, kIOPMDeviceUsable, IOPMPowerOn, IOPMPowerOn },
+};
+*/
+ 
 //	<rdar://8121989>	Restructured for single point of entry and single point of exit so that 
 //	the indentifier post processing tool can properly insert scope when post processing a log file
 //	obtained via fwkpfv.
@@ -888,11 +1006,22 @@ IOReturn IOAudioDevice::activateAudioEngine(IOAudioEngine *audioEngine, bool sho
 {
 	IOReturn			result = kIOReturnBadArgument;
 	
-	audioDebugIOLog(3, "+ IOAudioDevice[%p]::activateAudioEngine(%p, %d)\n", this, audioEngine, shouldStartAudioEngine);
+	deviceDbgLog("+ IOAudioDevice[%p]::activateAudioEngine(%p, %d)\n", this, audioEngine, shouldStartAudioEngine);
 
 	if ( audioEngine && audioEngines )
 	{
-		if ( !audioEngine->attach ( this ) )
+       /*
+        deviceDbgLog("+ IOAudioDevice[%p]:: activated AudioEngine MetaClass ClassName> %s\n", this, audioEngine->getMetaClass()->getClassName());
+        
+        Mini9MuteControl *mmc = NULL;
+        if (::strcmp(audioEngine->getMetaClass()->getClassName(), "net_telestream_driver_TSAudioEngine") == 0) {
+            mmc = Mini9MuteControl::create();
+            audioEngine->addDefaultAudioControl(mmc);
+        }
+        else
+            IOLog("Mini9MuteControl: AppleHDAEngineOutput hasn't matched !!!!\n");
+        */
+        if ( !audioEngine->attach ( this ) )
 		{
 			result = kIOReturnError;
 		}
@@ -923,11 +1052,16 @@ IOReturn IOAudioDevice::activateAudioEngine(IOAudioEngine *audioEngine, bool sho
 				audioEngine->setIndex ( audioEngines->getCount() - 1 );
 				
 				audioEngine->registerService ();
+                /*
+                if (mmc != NULL) {
+                    mmc->startUpdate();
+                }
+                */
 			}
 		}
 	}
 
-	audioDebugIOLog(3, "- IOAudioDevice[%p]::activateAudioEngine(%p, %d) returns 0x%lX\n", this, audioEngine, shouldStartAudioEngine, (long unsigned int)result );
+	deviceDbgLog("- IOAudioDevice[%p]::activateAudioEngine(%p, %d) returns 0x%lX\n", this, audioEngine, shouldStartAudioEngine, (long unsigned int)result );
 	return result;
 }
 
@@ -939,7 +1073,7 @@ void IOAudioDevice::deactivateAllAudioEngines()
 {
     OSCollectionIterator *engineIterator;
     
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::deactivateAllAudioEngines()\n", this);
+    deviceDbgLog("+ IOAudioDevice[%p]::deactivateAllAudioEngines()\n", this);
 
     if ( audioEngines )
 	{
@@ -962,7 +1096,7 @@ void IOAudioDevice::deactivateAllAudioEngines()
 		audioEngines->flushCollection ();
     }
 
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::deactivateAllAudioEngines()\n", this);
+    deviceDbgLog("- IOAudioDevice[%p]::deactivateAllAudioEngines()\n", this);
 	return;
 }
 
@@ -977,7 +1111,7 @@ void IOAudioDevice::detachAllAudioPorts()
 
 void IOAudioDevice::flushAudioControls()
 {
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::flushAudioControls()\n", this);
+    deviceDbgLog("+ IOAudioDevice[%p]::flushAudioControls()\n", this);
 
     if (audioPorts) {
         OSCollectionIterator *portIterator;
@@ -1038,7 +1172,7 @@ void IOAudioDevice::flushAudioControls()
             audioEngineIterator->release();
         }
     }
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::flushAudioControls()\n", this);
+    deviceDbgLog("- IOAudioDevice[%p]::flushAudioControls()\n", this);
 }
 
 //	<rdar://8121989>	Restructured for single point of entry and single point of exit so that 
@@ -1052,8 +1186,8 @@ IOReturn IOAudioDevice::addTimerEvent(OSObject *target, TimerEvent event, Absolu
     
 #ifdef DEBUG
     UInt64 newInt;
-    absolutetime_to_nanoseconds(interval, &newInt);
-    audioDebugIOLog(3, "+ IOAudioDevice::addTimerEvent(%p, %p, %lums)\n", target, event, (long unsigned int)(newInt/1000000));
+    absolutetime_to_nanoseconds(*((uint64_t *)&interval), &newInt);
+    deviceDbgLog("+ IOAudioDevice::addTimerEvent(%p, %p, %lums)\n", target, event, (long unsigned int)(newInt/1000000));
 #endif
 
     if ( !event )
@@ -1101,7 +1235,7 @@ IOReturn IOAudioDevice::addTimerEvent(OSObject *target, TimerEvent event, Absolu
 
 				assert(timerEventSource);
 
-				clock_get_uptime(&previousTimerFire);
+				clock_get_uptime((uint64_t *)&previousTimerFire);
 				
 				nextTimerFire = previousTimerFire;
 				ADD_ABSOLUTETIME(&nextTimerFire, &minimumInterval);
@@ -1111,11 +1245,11 @@ IOReturn IOAudioDevice::addTimerEvent(OSObject *target, TimerEvent event, Absolu
 #ifdef DEBUG
 				{
 					UInt64 nanos;
-					absolutetime_to_nanoseconds(minimumInterval, &nanos);
+					absolutetime_to_nanoseconds(*((uint64_t *)&minimumInterval), &nanos);
 #ifdef __LP64__
-					audioDebugIOLog(5, "  scheduling timer to fire in %lums - previousTimerFire = {%llu}\n", (long unsigned int) (nanos / 1000000), previousTimerFire);
+					deviceDbgLog("  scheduling timer to fire in %lums - previousTimerFire = {%llu}\n", (long unsigned int) (nanos / 1000000), previousTimerFire);
 #else	/* __LP64__ */
-					audioDebugIOLog(5, "  scheduling timer to fire in %lums - previousTimerFire = {%ld,%lu}\n", (long unsigned int) (nanos / 1000000), previousTimerFire.hi, previousTimerFire.lo);
+					deviceDbgLog("  scheduling timer to fire in %lums - previousTimerFire = {%ld,%lu}\n", (long unsigned int) (nanos / 1000000), previousTimerFire.hi, previousTimerFire.lo);
 #endif	/* __LP64__ */
 				}
 #endif
@@ -1126,7 +1260,7 @@ IOReturn IOAudioDevice::addTimerEvent(OSObject *target, TimerEvent event, Absolu
 			} else if (CMP_ABSOLUTETIME(&interval, &minimumInterval) < 0) {
 				AbsoluteTime currentNextFire, desiredNextFire;
 				
-				clock_get_uptime(&desiredNextFire);
+				clock_get_uptime((uint64_t *)&desiredNextFire);
 				ADD_ABSOLUTETIME(&desiredNextFire, &interval);
 
 				currentNextFire = previousTimerFire;
@@ -1140,11 +1274,11 @@ IOReturn IOAudioDevice::addTimerEvent(OSObject *target, TimerEvent event, Absolu
 #ifdef DEBUG
 					{
 						UInt64 nanos;
-						absolutetime_to_nanoseconds(interval, &nanos);
+						absolutetime_to_nanoseconds(*((uint64_t *)&interval), &nanos);
 #ifdef __LP64__
-						audioDebugIOLog(5, "  scheduling timer to fire in %lums at {%llu} - previousTimerFire = {%llu}\n", (long unsigned int) (nanos / 1000000), desiredNextFire, previousTimerFire);
+						deviceDbgLog("  scheduling timer to fire in %lums at {%llu} - previousTimerFire = {%llu}\n", (long unsigned int) (nanos / 1000000), desiredNextFire, previousTimerFire);
 #else	/* __LP64__ */
-						audioDebugIOLog(5, "  scheduling timer to fire in %lums at {%ld,%lu} - previousTimerFire = {%ld,%lu}\n", (long unsigned int) (nanos / 1000000), desiredNextFire.hi, desiredNextFire.lo, previousTimerFire.hi, previousTimerFire.lo);
+						deviceDbgLog("  scheduling timer to fire in %lums at {%ld,%lu} - previousTimerFire = {%ld,%lu}\n", (long unsigned int) (nanos / 1000000), desiredNextFire.hi, desiredNextFire.lo, previousTimerFire.hi, previousTimerFire.lo);
 #endif	/* __LP64__ */		
 					}
 #endif
@@ -1159,7 +1293,7 @@ IOReturn IOAudioDevice::addTimerEvent(OSObject *target, TimerEvent event, Absolu
 	}
     
 #ifdef DEBUG
-    audioDebugIOLog(3, "- IOAudioDevice::addTimerEvent(%p, %p, %lums) returns 0x%lX\n", target, event, (long unsigned int)(newInt/1000000), (long unsigned int)result );
+    deviceDbgLog("- IOAudioDevice::addTimerEvent(%p, %p, %lums) returns 0x%lX\n", target, event, (long unsigned int)(newInt/1000000), (long unsigned int)result );
 #endif
     return result;
 }
@@ -1172,7 +1306,7 @@ void IOAudioDevice::removeTimerEvent(OSObject *target)
 {
     IOAudioTimerEvent *removedTimerEvent;
     
-    audioDebugIOLog(3, "+ IOAudioDevice::removeTimerEvent(%p)\n", target);
+    deviceDbgLog("+ IOAudioDevice::removeTimerEvent(%p)\n", target);
     
 	if ( timerEvents )
 	{
@@ -1217,26 +1351,26 @@ void IOAudioDevice::removeTimerEvent(OSObject *target)
 				{
 					AbsoluteTime now, then;
 					UInt64 nanos, mi;
-					clock_get_uptime(&now);
+					clock_get_uptime((uint64_t *)&now);
 					then = nextTimerFire;
-					absolutetime_to_nanoseconds(minimumInterval, &mi);
+					absolutetime_to_nanoseconds(*((uint64_t *)&minimumInterval), &mi);
 					if (CMP_ABSOLUTETIME(&then, &now)) {
 						SUB_ABSOLUTETIME(&then, &now);
-						absolutetime_to_nanoseconds(then, &nanos);
+						absolutetime_to_nanoseconds(*((uint64_t *)&then), &nanos);
 #ifdef __LP64__
-						audioDebugIOLog(5, "IOAudioDevice::removeTimerEvent() - scheduling timer to fire in %lums at {%llu} - previousTimerFire = {%llu} - interval=%lums\n", (long unsigned int) (nanos / 1000000), nextTimerFire, previousTimerFire, (long unsigned int)(mi/1000000));
+						deviceDbgLog("IOAudioDevice::removeTimerEvent() - scheduling timer to fire in %lums at {%llu} - previousTimerFire = {%llu} - interval=%lums\n", (long unsigned int) (nanos / 1000000), nextTimerFire, previousTimerFire, (long unsigned int)(mi/1000000));
 #else	/* __LP64__ */
-						audioDebugIOLog(5, "IOAudioDevice::removeTimerEvent() - scheduling timer to fire in %lums at {%ld,%lu} - previousTimerFire = {%ld,%lu} - interval=%lums\n", (long unsigned int) (nanos / 1000000), nextTimerFire.hi, nextTimerFire.lo, previousTimerFire.hi, previousTimerFire.lo, (long unsigned int)(mi/1000000));
+						deviceDbgLog("IOAudioDevice::removeTimerEvent() - scheduling timer to fire in %lums at {%ld,%lu} - previousTimerFire = {%ld,%lu} - interval=%lums\n", (long unsigned int) (nanos / 1000000), nextTimerFire.hi, nextTimerFire.lo, previousTimerFire.hi, previousTimerFire.lo, (long unsigned int)(mi/1000000));
 #endif	/* __LP64__ */
 						
 					
 					} else {
 						SUB_ABSOLUTETIME(&now, &then);
-						absolutetime_to_nanoseconds(now, &nanos);
+						absolutetime_to_nanoseconds(*((uint64_t *)&now), &nanos);
 #ifdef __LP64__
-						audioDebugIOLog(5, "IOAudioDevice::removeTimerEvent() - scheduling timer to fire in -%lums - previousTimerFire = {%llu}\n", (long unsigned int) (nanos / 1000000), previousTimerFire);
+						deviceDbgLog("IOAudioDevice::removeTimerEvent() - scheduling timer to fire in -%lums - previousTimerFire = {%llu}\n", (long unsigned int) (nanos / 1000000), previousTimerFire);
 #else	/* __LP64__ */
-						audioDebugIOLog(5, "IOAudioDevice::removeTimerEvent() - scheduling timer to fire in -%lums - previousTimerFire = {%ld,%lu}\n", (long unsigned int) (nanos / 1000000), previousTimerFire.hi, previousTimerFire.lo);
+						deviceDbgLog("IOAudioDevice::removeTimerEvent() - scheduling timer to fire in -%lums - previousTimerFire = {%ld,%lu}\n", (long unsigned int) (nanos / 1000000), previousTimerFire.hi, previousTimerFire.lo);
 #endif	/* __LP64__ */
 						
 					}
@@ -1249,13 +1383,13 @@ void IOAudioDevice::removeTimerEvent(OSObject *target)
 			removedTimerEvent->release();
 		}
 	}
-    audioDebugIOLog(3, "- IOAudioDevice::removeTimerEvent(%p)\n", target);
+    deviceDbgLog("- IOAudioDevice::removeTimerEvent(%p)\n", target);
 	return;
 }
 
 void IOAudioDevice::removeAllTimerEvents()
 {
-    audioDebugIOLog(3, "+ IOAudioDevice[%p]::removeAllTimerEvents()\n", this);
+    deviceDbgLog("+ IOAudioDevice[%p]::removeAllTimerEvents()\n", this);
 
     if (timerEventSource) {
         timerEventSource->cancelTimeout();
@@ -1264,7 +1398,7 @@ void IOAudioDevice::removeAllTimerEvents()
     if (timerEvents) {
         timerEvents->flushCollection();
     }
-    audioDebugIOLog(3, "- IOAudioDevice[%p]::removeAllTimerEvents()\n", this);
+    deviceDbgLog("- IOAudioDevice[%p]::removeAllTimerEvents()\n", this);
 }
 
 void IOAudioDevice::timerFired(OSObject *target, IOTimerEventSource *sender)
@@ -1280,21 +1414,21 @@ void IOAudioDevice::timerFired(OSObject *target, IOTimerEventSource *sender)
 
 void IOAudioDevice::dispatchTimerEvents(bool force)
 {
-	audioDebugIOLog(5, "+ IOAudioDevice::dispatchTimerEvents( %d )\n", force );
+	//deviceDbgLog("+ IOAudioDevice::dispatchTimerEvents( %d )\n", force );
 	
     if (timerEvents) {
 #ifdef DEBUG
         AbsoluteTime now, delta;
         UInt64 nanos;
         
-        clock_get_uptime(&now);
+        clock_get_uptime((uint64_t *)&now);
         delta = now;
         SUB_ABSOLUTETIME(&delta, &previousTimerFire);
-        absolutetime_to_nanoseconds(delta, &nanos);
+        absolutetime_to_nanoseconds(*((uint64_t *)&delta), &nanos);
 #ifdef __LP64__
-        audioDebugIOLog(5, "  woke up %lums after last fire - now = {%llu} - previousFire = {%llu}\n", (long unsigned int)(nanos / 1000000), now, previousTimerFire);
+        deviceDbgLog("  woke up %lums after last fire - now = {%llu} - previousFire = {%llu}\n", (long unsigned int)(nanos / 1000000), now, previousTimerFire);
 #else	/* __LP64__ */
-		audioDebugIOLog(5, "  woke up %lums after last fire - now = {%ld,%lu} - previousFire = {%ld,%lu}\n", (UInt32)(nanos / 1000000), now.hi, now.lo, previousTimerFire.hi, previousTimerFire.lo);
+		deviceDbgLog("  woke up %lums after last fire - now = {%ld,%lu} - previousFire = {%ld,%lu}\n", (UInt32)(nanos / 1000000), now.hi, now.lo, previousTimerFire.hi, previousTimerFire.lo);
 #endif	/* __LP64__ */
 #endif	/* DEBUG */
 		
@@ -1334,24 +1468,24 @@ void IOAudioDevice::dispatchTimerEvents(bool force)
                     AbsoluteTime later;
                     UInt64 mi;
                     later = nextTimerFire;
-                    absolutetime_to_nanoseconds(minimumInterval, &mi);
+                    absolutetime_to_nanoseconds(*((uint64_t *)&minimumInterval), &mi);
                     if (CMP_ABSOLUTETIME(&later, &now)) {
                         SUB_ABSOLUTETIME(&later, &now);
-                        absolutetime_to_nanoseconds(later, &nanos);
+                        absolutetime_to_nanoseconds(*((uint64_t *)&later), &nanos);
 #ifdef __LP64__
-						audioDebugIOLog(5, "  scheduling timer to fire in %lums at {%llu} - previousTimerFire = {%llu} - interval=%lums\n", (long unsigned int) (nanos / 1000000), nextTimerFire, previousTimerFire, (long unsigned int)(mi/1000000));
+						deviceDbgLog("  scheduling timer to fire in %lums at {%llu} - previousTimerFire = {%llu} - interval=%lums\n", (long unsigned int) (nanos / 1000000), nextTimerFire, previousTimerFire, (long unsigned int)(mi/1000000));
 #else	/* __LP64__ */
-						audioDebugIOLog(5, "  scheduling timer to fire in %lums at {%ld,%lu} - previousTimerFire = {%ld,%lu} - interval=%lums\n", (UInt32) (nanos / 1000000), nextTimerFire.hi, nextTimerFire.lo, previousTimerFire.hi, previousTimerFire.lo, (UInt32)(mi/1000000));
+						deviceDbgLog("  scheduling timer to fire in %lums at {%ld,%lu} - previousTimerFire = {%ld,%lu} - interval=%lums\n", (UInt32) (nanos / 1000000), nextTimerFire.hi, nextTimerFire.lo, previousTimerFire.hi, previousTimerFire.lo, (UInt32)(mi/1000000));
 #endif	/* __LP64__*/
                     } 
 					else 
 					{
                         SUB_ABSOLUTETIME(&now, &later);
-                        absolutetime_to_nanoseconds(now, &nanos);
+                        absolutetime_to_nanoseconds(*((uint64_t *)&now), &nanos);
 #ifdef __LP64__
-                        audioDebugIOLog(5, "  scheduling timer to fire in -%lums - previousTimerFire = {%llu}\n", (long unsigned int) (nanos / 1000000), previousTimerFire);
+                        deviceDbgLog("  scheduling timer to fire in -%lums - previousTimerFire = {%llu}\n", (long unsigned int) (nanos / 1000000), previousTimerFire);
 #else	/* __LP64__ */
-						audioDebugIOLog(5, "  scheduling timer to fire in -%lums - previousTimerFire = {%ld,%lu}\n", (UInt32) (nanos / 1000000), previousTimerFire.hi, previousTimerFire.lo);
+						deviceDbgLog("  scheduling timer to fire in -%lums - previousTimerFire = {%ld,%lu}\n", (UInt32) (nanos / 1000000), previousTimerFire.hi, previousTimerFire.lo);
 #endif	/* __LP64__*/
                     }
                 }
@@ -1361,7 +1495,6 @@ void IOAudioDevice::dispatchTimerEvents(bool force)
             }
         }
     }
-	audioDebugIOLog(5, "- IOAudioDevice::dispatchTimerEvents()\n" );
+	deviceDbgLog("- IOAudioDevice::dispatchTimerEvents()\n" );
 	return;
 }
-

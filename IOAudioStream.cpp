@@ -121,20 +121,20 @@ bool IOAudioStream::validateFormat(IOAudioStreamFormat *streamFormat, IOAudioStr
 {
     bool foundFormat = false;
     
-    audioDebugIOLog(3, "+ IOAudioStream[%p]::validateFormat(%p, %p, %p)\n", this, streamFormat, formatExtension, formatDesc);
+    DbgLog("+ IOAudioStream[%p]::validateFormat(%p, %p, %p)\n", this, streamFormat, formatExtension, formatDesc);
 
     
     if (streamFormat && availableFormats && (numAvailableFormats > 0) && sampleRate) {
         UInt32 formatIndex;
 
         for (formatIndex = 0; formatIndex < numAvailableFormats; formatIndex++) {
-			audioDebugIOLog(3, "  %ld: streamFormat->fNumChannels = %ld\n", (long int)availableFormats[formatIndex].format.fNumChannels, (long int)streamFormat->fNumChannels);
-			audioDebugIOLog(3, "  0x%lx: streamFormat->fSampleFormat = 0x%lx\n", (long unsigned int)availableFormats[formatIndex].format.fSampleFormat, (long unsigned int)streamFormat->fSampleFormat);
-			audioDebugIOLog(3, "  0x%lx: streamFormat->fNumericRepresentation = 0x%lx\n", (long unsigned int)availableFormats[formatIndex].format.fNumericRepresentation, (long unsigned int)streamFormat->fNumericRepresentation);
-			audioDebugIOLog(3, "  %d: streamFormat->fBitDepth = %d\n", availableFormats[formatIndex].format.fBitDepth, streamFormat->fBitDepth);
-			audioDebugIOLog(3, "  %d: streamFormat->fBitWidth = %d\n", availableFormats[formatIndex].format.fBitWidth, streamFormat->fBitWidth);
-			audioDebugIOLog(3, "  %d: streamFormat->fAlignment = %d\n", availableFormats[formatIndex].format.fAlignment, streamFormat->fAlignment);
-			audioDebugIOLog(3, "  %d: streamFormat->fByteOrder = %d\n", availableFormats[formatIndex].format.fByteOrder, streamFormat->fByteOrder);
+			DbgLog("  %ld: streamFormat->fNumChannels = %ld\n", (long int)availableFormats[formatIndex].format.fNumChannels, (long int)streamFormat->fNumChannels);
+			DbgLog("  0x%lx: streamFormat->fSampleFormat = 0x%lx\n", (long unsigned int)availableFormats[formatIndex].format.fSampleFormat, (long unsigned int)streamFormat->fSampleFormat);
+			DbgLog("  0x%lx: streamFormat->fNumericRepresentation = 0x%lx\n", (long unsigned int)availableFormats[formatIndex].format.fNumericRepresentation, (long unsigned int)streamFormat->fNumericRepresentation);
+			DbgLog("  %d: streamFormat->fBitDepth = %d\n", availableFormats[formatIndex].format.fBitDepth, streamFormat->fBitDepth);
+			DbgLog("  %d: streamFormat->fBitWidth = %d\n", availableFormats[formatIndex].format.fBitWidth, streamFormat->fBitWidth);
+			DbgLog("  %d: streamFormat->fAlignment = %d\n", availableFormats[formatIndex].format.fAlignment, streamFormat->fAlignment);
+			DbgLog("  %d: streamFormat->fByteOrder = %d\n", availableFormats[formatIndex].format.fByteOrder, streamFormat->fByteOrder);
             if ((availableFormats[formatIndex].format.fNumChannels == streamFormat->fNumChannels)
 				&& (availableFormats[formatIndex].format.fSampleFormat == streamFormat->fSampleFormat)
 				&& (availableFormats[formatIndex].format.fNumericRepresentation == streamFormat->fNumericRepresentation)
@@ -167,7 +167,7 @@ bool IOAudioStream::validateFormat(IOAudioStreamFormat *streamFormat, IOAudioStr
         }
     }
     
-    audioDebugIOLog(3, "- IOAudioStream[%p]::validateFormat(%p, %p, %p) returns %d\n", this, streamFormat, formatExtension, formatDesc, foundFormat );
+    DbgLog("- IOAudioStream[%p]::validateFormat(%p, %p, %p) returns %d\n", this, streamFormat, formatExtension, formatDesc, foundFormat );
     return foundFormat;
 }
 
@@ -217,7 +217,7 @@ IOReturn IOAudioStream::setFormat(const IOAudioStreamFormat *streamFormat, const
     const IOAudioSampleRate *requestedSampleRate = NULL;
     OSDictionary *sampleRateDict;
     
-    audioDebugIOLog(3, "+ IOAudioStream[%p]::setFormat(%p, %p)\n", this, streamFormat, formatDict);
+    DbgLog("+ IOAudioStream[%p]::setFormat(%p, %p)\n", this, streamFormat, formatDict);
 
     if (!streamFormat || !formatDict)
 	{
@@ -401,7 +401,7 @@ IOReturn IOAudioStream::setFormat(const IOAudioStreamFormat *streamFormat, const
     
 Done:
     
-    audioDebugIOLog(3, "IOAudioStream[%p]::setFormat(%p, %p) returns 0x%lx", this, streamFormat, formatDict, (long unsigned int)result);
+    DbgLog("IOAudioStream[%p]::setFormat(%p, %p) returns 0x%lx", this, streamFormat, formatDict, (long unsigned int)result);
 
     return result;
 }
@@ -509,21 +509,21 @@ IOReturn IOAudioStream::mixOutputSamples(const void *sourceBuf, void *mixBuf, UI
 
 void IOAudioStream::setSampleLatency(UInt32 numSamples)
 {
-    audioDebugIOLog(3, "+-IOAudioStream[%p]::setSampleLatency(0x%lx)\n", this, (long unsigned int)numSamples);
+    DbgLog("+-IOAudioStream[%p]::setSampleLatency(0x%lx)\n", this, (long unsigned int)numSamples);
     setProperty(kIOAudioStreamSampleLatencyKey, numSamples, sizeof(UInt32)*8);
 }
 
 UInt32 IOAudioStream::getNumSampleFramesRead()
 {
 	assert(reserved);
-    audioDebugIOLog(4, "+-IOAudioStream[%p]::getNumSampleFramesRead() returns %ld\n", this, (long unsigned int)reserved->mSampleFramesReadByEngine);
+    DbgLog("+-IOAudioStream[%p]::getNumSampleFramesRead() returns %ld\n", this, (long unsigned int)reserved->mSampleFramesReadByEngine);
 	return reserved->mSampleFramesReadByEngine;
 }
 
 void IOAudioStream::setDefaultNumSampleFramesRead(UInt32 inDefaultNumFramesRead)
 {
 	assert(reserved);
-    audioDebugIOLog(4, "+-IOAudioStream[%p]::setDefaultNumSampleFramesRead(%ld)\n", this, (long unsigned int)inDefaultNumFramesRead);
+    DbgLog("+-IOAudioStream[%p]::setDefaultNumSampleFramesRead(%ld)\n", this, (long unsigned int)inDefaultNumFramesRead);
 	reserved->mSampleFramesReadByEngine = inDefaultNumFramesRead;
 }
 
@@ -901,7 +901,7 @@ IOReturn IOAudioStream::setProperties(OSObject *properties)
     OSDictionary *props;
     IOReturn result = kIOReturnSuccess;
     
-    audioDebugIOLog(3, "+ IOAudioStream[%p]::setProperties(%p)\n", this, properties);
+    DbgLog("+ IOAudioStream[%p]::setProperties(%p)\n", this, properties);
 
     if (properties && (props = OSDynamicCast(OSDictionary, properties))) {
         OSCollectionIterator *iterator;
@@ -929,7 +929,7 @@ IOReturn IOAudioStream::setProperties(OSObject *properties)
         result = kIOReturnBadArgument;
     }
 
-    audioDebugIOLog(3, "- IOAudioStream[%p]::setProperties(%p) returns 0x%lX\n", this, properties, (long unsigned int)result );
+    DbgLog("- IOAudioStream[%p]::setProperties(%p) returns 0x%lX\n", this, properties, (long unsigned int)result );
     return result;
 }
 
@@ -1185,7 +1185,7 @@ IOReturn IOAudioStream::addClient(IOAudioClientBuffer *clientBuffer)
 {
     IOReturn result = kIOReturnBadArgument;
 	
-    audioDebugIOLog(3, "+ IOAudioStream[%p]::addClient(%p)\n", this, clientBuffer);
+    DbgLog("+ IOAudioStream[%p]::addClient(%p)\n", this, clientBuffer);
 
     if (clientBuffer) {
         assert(clientBuffer->audioStream == this);
@@ -1202,7 +1202,7 @@ IOReturn IOAudioStream::addClient(IOAudioClientBuffer *clientBuffer)
 				tmpClientBuffer = tmpClientBuffer->nextClient;
 			}
 			if (tmpClientBuffer) {
-				audioDebugIOLog(3, "   clientBuffer %p is already in the list.\n", tmpClientBuffer);
+				DbgLog("   clientBuffer %p is already in the list.\n", tmpClientBuffer);
 				bufferInList = true;
 			}
 		}
@@ -1254,13 +1254,13 @@ IOReturn IOAudioStream::addClient(IOAudioClientBuffer *clientBuffer)
         unlockStreamForIO();
     }
     
-    audioDebugIOLog(3, "- IOAudioStream[%p]::addClient(%p) returns 0x%lX\n", this, clientBuffer, (long unsigned int)result );
+    DbgLog("- IOAudioStream[%p]::addClient(%p) returns 0x%lX\n", this, clientBuffer, (long unsigned int)result );
     return result;
 }
 
 void IOAudioStream::removeClient(IOAudioClientBuffer *clientBuffer)
 {
-    audioDebugIOLog(3, "+ IOAudioStream[%p]::removeClient(%p)\n", this, clientBuffer);
+    DbgLog("+ IOAudioStream[%p]::removeClient(%p)\n", this, clientBuffer);
 
     if (clientBuffer) {
         IOAudioClientBuffer *tmpClientBuffer, *previousClientBuffer = NULL;
@@ -1326,7 +1326,7 @@ void IOAudioStream::removeClient(IOAudioClientBuffer *clientBuffer)
 		unlockStreamForIO();
     }
 	
-    audioDebugIOLog(3, "- IOAudioStream[%p]::removeClient(%p)\n", this, clientBuffer);
+    DbgLog("- IOAudioStream[%p]::removeClient(%p)\n", this, clientBuffer);
 	return;
 }
 
@@ -1341,7 +1341,7 @@ void dumpList(IOAudioClientBuffer *start)
     
     tmp = start;
     while (tmp) {
-        audioDebugIOLog(3, "  (%lx,%lx)\n", (long unsigned int)tmp->mixedPosition.fLoopCount, (long unsigned int)tmp->mixedPosition.fSampleFrame);
+        DbgLog("  (%lx,%lx)\n", (long unsigned int)tmp->mixedPosition.fLoopCount, (long unsigned int)tmp->mixedPosition.fSampleFrame);
         tmp = tmp->nextClip;
     }
 }
@@ -1353,7 +1353,7 @@ void validateList(IOAudioClientBuffer *start)
     tmp = start;
     while (tmp) {
         if (tmp->nextClip && (CMP_IOAUDIOENGINEPOSITION(&tmp->mixedPosition, &tmp->nextClip->mixedPosition) > 0)) {
-            audioDebugIOLog(3, "+-IOAudioStream: ERROR - client buffer list not sorted!\n");
+            DbgLog("+-IOAudioStream: ERROR - client buffer list not sorted!\n");
             dumpList(start);
             break;
         }
@@ -1432,8 +1432,8 @@ IOReturn IOAudioStream::processOutputSamples(IOAudioClientBuffer *clientBuffer, 
 {
     IOReturn result = kIOReturnSuccess;
 	
-    //audioDebugIOLog(6, "IOAudioStream[%p]::processOutputSamples(%p, 0x%lx)\n", this, clientBuffer, firstSampleFrame);
-    //audioDebugIOLog(6, "m(%lx,%lx,%lx)\n", loopCount, firstSampleFrame, clientBuffer->numSampleFrames);
+    //DbgLog("IOAudioStream[%p]::processOutputSamples(%p, 0x%lx)\n", this, clientBuffer, firstSampleFrame);
+    //DbgLog("m(%lx,%lx,%lx)\n", loopCount, firstSampleFrame, clientBuffer->numSampleFrames);
 
     assert(direction == kIOAudioStreamDirectionOutput);
     if (clientBuffer) {
@@ -1458,7 +1458,7 @@ IOReturn IOAudioStream::processOutputSamples(IOAudioClientBuffer *clientBuffer, 
                 // If firstSampleFrame is not the same as the previous mixed position sample frame,
                 // then adjust it to the firstSampleFrame - looping if necessary
                 if ((clientBuffer->mixedPosition.fSampleFrame != firstSampleFrame) || (clientBuffer->mixedPosition.fLoopCount != loopCount)) {
-                    audioDebugIOLog(6, "IOAudioStream[%p]::processOutputSamples(%p) - Mix start position (%lx,%lx) is not previous mixed position (%lx,%lx)\n", 
+                    DbgLog("IOAudioStream[%p]::processOutputSamples(%p) - Mix start position (%lx,%lx) is not previous mixed position (%lx,%lx)\n", 
 										this, 
 										clientBuffer, 
 										(long unsigned int)loopCount, 
@@ -1485,7 +1485,7 @@ IOReturn IOAudioStream::processOutputSamples(IOAudioClientBuffer *clientBuffer, 
                     } else {
                         clientBuffer->mixedPosition.fLoopCount = clientBufferListEnd->mixedPosition.fLoopCount;
                     }
-					audioDebugIOLog(6, "IOAudioStream[%p]::processOutputSamples(%p) - more than one buffer behind (%lx,%lx) adjusting to (%lx,%lx)\n", 
+					DbgLog("IOAudioStream[%p]::processOutputSamples(%p) - more than one buffer behind (%lx,%lx) adjusting to (%lx,%lx)\n", 
 										this, 
 										clientBuffer, 
 										(long unsigned int)clientBufferListEnd->mixedPosition.fLoopCount, 
@@ -1506,7 +1506,7 @@ IOReturn IOAudioStream::processOutputSamples(IOAudioClientBuffer *clientBuffer, 
 #ifdef DEBUG
                         UInt32 samplesMissed;
                         samplesMissed = clippedPosition.fSampleFrame - clientBuffer->mixedPosition.fSampleFrame;
-                        audioDebugIOLog(6, "IOAudioStream[%p]::processOutputSamples(%p) - Reset clip position (%lx,%lx)->(%lx,%lx) - %lx samples.\n", 
+                        DbgLog("IOAudioStream[%p]::processOutputSamples(%p) - Reset clip position (%lx,%lx)->(%lx,%lx) - %lx samples.\n", 
 										this, 
 										clientBuffer, 
 										(long unsigned int)clippedPosition.fLoopCount, 
@@ -1525,7 +1525,7 @@ IOReturn IOAudioStream::processOutputSamples(IOAudioClientBuffer *clientBuffer, 
                     UInt32 samplesMissed;
                     samplesMissed = (clippedPosition.fLoopCount - clientBuffer->mixedPosition.fLoopCount - 1) * numSampleFramesPerBuffer;
                     samplesMissed += clippedPosition.fSampleFrame + numSampleFramesPerBuffer - clientBuffer->mixedPosition.fSampleFrame;
-                    audioDebugIOLog(6, "IOAudioStream[%p]::processOutputSamples(%p) - Reset clip position (%lx,%lx)->(%lx,%lx) - %lx samples.\n", 
+                    DbgLog("IOAudioStream[%p]::processOutputSamples(%p) - Reset clip position (%lx,%lx)->(%lx,%lx) - %lx samples.\n", 
 										this, 
 										clientBuffer, 
 										(long unsigned int)clippedPosition.fLoopCount, 
@@ -1553,13 +1553,13 @@ IOReturn IOAudioStream::processOutputSamples(IOAudioClientBuffer *clientBuffer, 
                 UInt32 currentSampleFrame = audioEngine->getCurrentSampleFrame();
                 if (currentSampleFrame > firstSampleFrame) {
                     if ((firstSampleFrame + clientBuffer->numSampleFrames) > currentSampleFrame) {
-                        //audioDebugIOLog(6, "IOAudioStream[%p]::processOutputSamples(%p) - Error: Some samples already played: first=%lx num=%lx curr=%lx\n", this, clientBuffer, firstSampleFrame, clientBuffer->numSampleFrames, currentSampleFrame);
-                        audioDebugIOLog(6, "mix() missed first=%lx num=%lx curr=%lx\n", firstSampleFrame, clientBuffer->numSampleFrames, currentSampleFrame);
+                        //DbgLog("IOAudioStream[%p]::processOutputSamples(%p) - Error: Some samples already played: first=%lx num=%lx curr=%lx\n", this, clientBuffer, firstSampleFrame, clientBuffer->numSampleFrames, currentSampleFrame);
+                        DbgLog("mix() missed first=%lx num=%lx curr=%lx\n", firstSampleFrame, clientBuffer->numSampleFrames, currentSampleFrame);
                     }
                 } else {
                     if ((clientBuffer->numSampleFrames + firstSampleFrame) > (currentSampleFrame + numSampleFramesPerBuffer)) {
-                        //audioDebugIOLog(6, "IOAudioStream[%p]::processOutputSamples(%p) - Error: Some samples already played: first=%lx num=%lx curr=%lx\n", this, clientBuffer, firstSampleFrame, clientBuffer->numSampleFrames, currentSampleFrame);
-                        audioDebugIOLog(6, "mix() missed first=%lx num=%lx curr=%lx\n", firstSampleFrame, clientBuffer->numSampleFrames, currentSampleFrame);
+                        //DbgLog("IOAudioStream[%p]::processOutputSamples(%p) - Error: Some samples already played: first=%lx num=%lx curr=%lx\n", this, clientBuffer, firstSampleFrame, clientBuffer->numSampleFrames, currentSampleFrame);
+                        DbgLog("mix() missed first=%lx num=%lx curr=%lx\n", firstSampleFrame, clientBuffer->numSampleFrames, currentSampleFrame);
                     }
                 }
 #endif
@@ -1737,7 +1737,7 @@ void IOAudioStream::resetClipInfo()
 
 void IOAudioStream::clipIfNecessary()
 {
-    //audioDebugIOLog(6, "IOAudioStream[%p]::clipIfNecessary()\n", this);
+    //DbgLog("IOAudioStream[%p]::clipIfNecessary()\n", this);
 
     if (clientBufferListStart != NULL) {
         // Only try to clip if there is not an unmixed buffer
@@ -1760,7 +1760,7 @@ void IOAudioStream::clipIfNecessary()
                     if (clientBufferListStart->mixedPosition.fSampleFrame > clippedPosition.fSampleFrame) {
                         if ((tmp->mixedPosition.fSampleFrame > clippedPosition.fSampleFrame) &&
                             (clientBufferListStart->mixedPosition.fSampleFrame > tmp->mixedPosition.fSampleFrame)) {
-                            audioDebugIOLog(6, "IOAudioStream[%p]::clipIfNecessary() - Error: Clipping across future buffer boundary - glitching! (%lx,%lx)->(%lx,%lx) buf=(%lx,%lx)\n", 
+                            DbgLog("IOAudioStream[%p]::clipIfNecessary() - Error: Clipping across future buffer boundary - glitching! (%lx,%lx)->(%lx,%lx) buf=(%lx,%lx)\n", 
 											this, 
 											(long unsigned int)clippedPosition.fLoopCount, 
 											(long unsigned int)clippedPosition.fSampleFrame, 
@@ -1774,7 +1774,7 @@ void IOAudioStream::clipIfNecessary()
                     } else if (clippedPosition.fSampleFrame > clientBufferListStart->mixedPosition.fSampleFrame) {
                         if ((tmp->mixedPosition.fSampleFrame < clientBufferListStart->mixedPosition.fSampleFrame) ||
                             (tmp->mixedPosition.fSampleFrame > clippedPosition.fSampleFrame)) {
-                            audioDebugIOLog(6, "IOAudioStream[%p]::clipIfNecessary() - Error: Clipping across future buffer boundary - glitching! (%lx,%lx)->(%lx,%lx) buf=(%lx,%lx)\n", 
+                            DbgLog("IOAudioStream[%p]::clipIfNecessary() - Error: Clipping across future buffer boundary - glitching! (%lx,%lx)->(%lx,%lx) buf=(%lx,%lx)\n", 
 											this, 
 											(long unsigned int)clippedPosition.fLoopCount, 
 											(long unsigned int)clippedPosition.fSampleFrame, 
@@ -1814,7 +1814,7 @@ void IOAudioStream::clipIfNecessary()
 /*
 	static UInt32 lastSampleFrame;
 	if (clippedPosition.fSampleFrame != lastSampleFrame) {
-		audioDebugIOLog(3, "Family sample frames wrong %ld %ld\n", clippedPosition.fSampleFrame, lastSampleFrame);
+		DbgLog("Family sample frames wrong %ld %ld\n", clippedPosition.fSampleFrame, lastSampleFrame);
 	}
 	lastSampleFrame = clippedPosition.fSampleFrame + (clientBufferListStart->mixedPosition.fSampleFrame - clippedPosition.fSampleFrame);
 */
@@ -1829,7 +1829,7 @@ void IOAudioStream::clipIfNecessary()
 						} else {
 							reserved->mClipOutputStatus = kIOReturnOverrun;
 #ifdef DEBUG
-							audioDebugIOLog(6,"IOAudioStream[%p]::clipIfNecessary() clipOutputSamples clip too large for source buffer numSamplesToClip=%lu clientBufferListStart->numSampleFrames %lu\n", 
+							DbgLog("IOAudioStream[%p]::clipIfNecessary() clipOutputSamples clip too large for source buffer numSamplesToClip=%lu clientBufferListStart->numSampleFrames %lu\n", 
 											this, (long unsigned int)numSamplesToClip, (long unsigned int)clientBufferListStart->numSampleFrames );
 							IOLog("IOAudioStream[%p]::clipIfNecessary() clipOutputSamples clip too large for source buffer numSamplesToClip=%lu clientBufferListStart->numSampleFrames %lu\n", 
 											this, (long unsigned int)numSamplesToClip, (long unsigned int)clientBufferListStart->numSampleFrames );
@@ -1857,7 +1857,7 @@ void IOAudioStream::clipIfNecessary()
 					} else {
 						reserved->mClipOutputStatus = kIOReturnOverrun;
 #ifdef DEBUG
-						audioDebugIOLog(6,"IOAudioStream[%p]::clipIfNecessary() clipOutputSamples wrap clip too large for source buffer numSamplesToClip=%lu clientBufferListStart->numSampleFrames %lu\n", 
+						DbgLog("IOAudioStream[%p]::clipIfNecessary() clipOutputSamples wrap clip too large for source buffer numSamplesToClip=%lu clientBufferListStart->numSampleFrames %lu\n", 
 									this, (long unsigned int)numSamplesToClip, (long unsigned int)clientBufferListStart->numSampleFrames );					
 						IOLog("IOAudioStream[%p]::clipIfNecessary() clipOutputSamples wrap clip too large for source buffer numSamplesToClip=%lu clientBufferListStart->numSampleFrames %lu\n", 
 									this, (long unsigned int)numSamplesToClip, (long unsigned int)clientBufferListStart->numSampleFrames );					
@@ -1872,7 +1872,7 @@ void IOAudioStream::clipIfNecessary()
 					
 					// Move the mix buffer to where we left off because the clip routine always starts at the beginning of the source buffer,
 					// but that's not the right place when we don't have a source buffer and are using the mixbuffer as a pseduo-source buffer.
-					audioDebugIOLog(6,"IOAudioStream[%p]::clipIfNecessary() clipOutputSamples wrap  mixBuffer=%p remainingSamplesToClip=0x%lu clientBufferListStart->mixedPosition.fSampleFrame=%lu\n", 
+					DbgLog("IOAudioStream[%p]::clipIfNecessary() clipOutputSamples wrap  mixBuffer=%p remainingSamplesToClip=0x%lu clientBufferListStart->mixedPosition.fSampleFrame=%lu\n", 
 									this, mixBuffer, (long unsigned int)remainingSamplesToClip, (long unsigned int)clientBufferListStart->mixedPosition.fSampleFrame );				
 					if ( remainingSamplesToClip + clientBufferListStart->mixedPosition.fSampleFrame <= kMixBufferMaxSize) // <rdar://problem/5994776>
 					{
@@ -1881,7 +1881,7 @@ void IOAudioStream::clipIfNecessary()
 					} else {
 						reserved->mClipOutputStatus = kIOReturnOverrun;
 #ifdef DEBUG
-						audioDebugIOLog(6,"IOAudioStream[%p]::clipIfNecessary() clipOutputSamples mixBufferOffset  too large for source buffer numSamplesToClip=%lu clientBufferListStart->numSampleFrames=%lu remainingSamplesToClip=%lu\n", 
+						DbgLog("IOAudioStream[%p]::clipIfNecessary() clipOutputSamples mixBufferOffset  too large for source buffer numSamplesToClip=%lu clientBufferListStart->numSampleFrames=%lu remainingSamplesToClip=%lu\n", 
 									this, (long unsigned int)clientBufferListStart->mixedPosition.fSampleFrame, (long unsigned int)clientBufferListStart->numSampleFrames, (long unsigned int)remainingSamplesToClip );							
 						IOLog("IOAudioStream[%p]::clipIfNecessary() clipOutputSamples mixBufferOffset  too large for source buffer numSamplesToClip=%lu clientBufferListStart->numSampleFrames=%lu remainingSamplesToClip=%lu\n", 
 									this, (long unsigned int)clientBufferListStart->mixedPosition.fSampleFrame, (long unsigned int)clientBufferListStart->numSampleFrames, (long unsigned int)remainingSamplesToClip );
@@ -1900,8 +1900,8 @@ void IOAudioStream::clipOutputSamples(UInt32 firstSampleFrame, UInt32 numSampleF
 {
     IOReturn result = kIOReturnSuccess;
     
-    //audioDebugIOLog(6, "IOAudioStream[%p]::clipOutputSamples(0x%lx, 0x%lx)\n", this, firstSampleFrame, numSampleFrames);
-    //audioDebugIOLog(6, "c(%lx,%lx) %lx\n", firstSampleFrame, numSampleFrames, audioEngine->getCurrentSampleFrame());
+    //DbgLog("IOAudioStream[%p]::clipOutputSamples(0x%lx, 0x%lx)\n", this, firstSampleFrame, numSampleFrames);
+    //DbgLog("c(%lx,%lx) %lx\n", firstSampleFrame, numSampleFrames, audioEngine->getCurrentSampleFrame());
 
     assert(direction == kIOAudioStreamDirectionOutput);
     assert(audioEngine);
@@ -1918,13 +1918,13 @@ void IOAudioStream::clipOutputSamples(UInt32 firstSampleFrame, UInt32 numSampleF
     
     if (currentSampleFrame > firstSampleFrame) {
         if ((firstSampleFrame + numSampleFrames) > currentSampleFrame) {
-            //audioDebugIOLog(6, "IOAudioStream[%p]::clipOutputSamples(0x%lx, 0x%lx) - too late for some samples - current position = 0x%lx.\n", this, firstSampleFrame, numSampleFrames, currentSampleFrame);
-            audioDebugIOLog(6, "clip(%lx,%lx) missed curr=%lx.\n", firstSampleFrame, numSampleFrames, currentSampleFrame);
+            //DbgLog("IOAudioStream[%p]::clipOutputSamples(0x%lx, 0x%lx) - too late for some samples - current position = 0x%lx.\n", this, firstSampleFrame, numSampleFrames, currentSampleFrame);
+            DbgLog("clip(%lx,%lx) missed curr=%lx.\n", firstSampleFrame, numSampleFrames, currentSampleFrame);
         }
     } else {
         if ((numSampleFrames + firstSampleFrame) > (currentSampleFrame + audioEngine->getNumSampleFramesPerBuffer())) {
-            //audioDebugIOLog(6, "IOAudioStream[%p]::clipOutputSamples(0x%lx, 0x%lx) - too late for some samples - current position = 0x%lx.\n", this, firstSampleFrame, numSampleFrames, currentSampleFrame);
-            audioDebugIOLog(6, "clip(%lx,%lx) missed curr=%lx.\n", firstSampleFrame, numSampleFrames, currentSampleFrame);
+            //DbgLog("IOAudioStream[%p]::clipOutputSamples(0x%lx, 0x%lx) - too late for some samples - current position = 0x%lx.\n", this, firstSampleFrame, numSampleFrames, currentSampleFrame);
+            DbgLog("clip(%lx,%lx) missed curr=%lx.\n", firstSampleFrame, numSampleFrames, currentSampleFrame);
         }
     }
 #endif

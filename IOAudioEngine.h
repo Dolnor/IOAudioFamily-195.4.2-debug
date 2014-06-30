@@ -68,6 +68,29 @@ typedef struct {
             
 #define IOAUDIOENGINEPOSITION_IS_ZERO(p1) (((p1)->fLoopCount == 0) && ((p1)->fSampleFrame == 0))
 
+
+#define CMP_ABSOLUTETIME(t1, t2)            \
+(AbsoluteTime_to_scalar(t1) >               \
+ AbsoluteTime_to_scalar(t2)? (int)+1 :      \
+(AbsoluteTime_to_scalar(t1) <               \
+AbsoluteTime_to_scalar(t2)? (int)-1 : 0))
+
+/* t1 += t2 */
+#define ADD_ABSOLUTETIME(t1, t2)            \
+(AbsoluteTime_to_scalar(t1) +=              \
+    AbsoluteTime_to_scalar(t2))
+
+/* t1 -= t2 */
+#define SUB_ABSOLUTETIME(t1, t2)            \
+(AbsoluteTime_to_scalar(t1) -=              \
+    AbsoluteTime_to_scalar(t2))
+
+ #define ADD_ABSOLUTETIME_TICKS(t1, ticks)   \
+(AbsoluteTime_to_scalar(t1) +=               \
+    (int32_t)(ticks))
+
+ #define AbsoluteTime_to_scalar(x)    (*(uint64_t *)(x))
+
 /*!
  * @class IOAudioEngine
  * @abstract Abstract base class for a single audio audio / I/O engine.
