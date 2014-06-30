@@ -535,25 +535,31 @@
 		306FEE6F090FDD0A00D6B7FE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"DEBUG_DEVC=1",
+					"DEBUG_MSG=0",
+				);
+				INFOPLIST_PREPROCESSOR_DEFINITIONS = "";
 				SDKROOT = macosx;
 				SYMROOT = build;
-				VALID_ARCHS = "armv6 armv7 x86_64";
+				VALID_ARCHS = x86_64;
 			};
 			name = Development;
 		};
 		306FEE70090FDD0A00D6B7FE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
-				VALID_ARCHS = "armv6 armv7 x86_64";
+				SDKROOT = macosx;
+				VALID_ARCHS = x86_64;
 			};
 			name = Deployment;
 		};
 		306FEE71090FDD0A00D6B7FE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
-				VALID_ARCHS = "armv6 armv7 x86_64";
+				SDKROOT = macosx;
+				VALID_ARCHS = x86_64;
 			};
 			name = Default;
 		};
@@ -569,13 +575,18 @@
 				GCC_ENABLE_SSE41_EXTENSIONS = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"DEBUG_DEVC=1",
+					"DEBUG_MSG=0",
+				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_USE_STANDARD_INCLUDE_SEARCHING = YES;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Info-IOAudioFamily.plist";
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-I.";
 				INFOPLIST_PREPROCESS = YES;
-				INFOPLIST_PREPROCESSOR_DEFINITIONS = DEBUG;
+				INFOPLIST_PREPROCESSOR_DEFINITIONS = "";
 				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Extensions";
 				KERNEL_MODULE = YES;
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
